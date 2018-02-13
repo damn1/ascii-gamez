@@ -18,14 +18,31 @@
   <body>
 
     <div id="tetris-app">
-      
-      <div class="game-intro">
-        <pre>{{ intro }}</pre>
+      <div class="row">
+        <div class="game-intro">
+          <pre>{{ intro }}</pre>
+        </div>
       </div>
-      
-      <div class="game-intro">
-        <pre>{{ field_str }}</pre>
-        <pre>{{ message }}</pre>
+
+      <div class="row">
+
+        <div id="start-container" class="game-intro col-sm-2">
+          <div id="start-div">
+            <pre>{{ start }}</pre>
+          </div>
+          <div id="commands-in">
+            <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch">
+          </div>
+        </div>
+
+
+        <div class="game-intro col-sm-8">
+          <pre>{{ field_str_vue }}</pre>
+        </div>
+
+        <div class="game-intro col-sm-2">
+          <pre>{{ commands }}</pre>
+        </div>
       </div>
 
     </div>

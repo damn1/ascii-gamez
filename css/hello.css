@@ -29,4 +29,34 @@ textarea, input, button { outline: none; }
 .game-intro pre {
   display: inline-block;
   text-align: left;
+    line-height: normal;
+}
+
+#start-container {
+  position: relative; /* for absolute child element */
+  display: inline-block; /* to take the width of the input */
+}
+
+#commands-in {
+  text-align: left;
+  width: 100%;
+  height: 100%; /* added to match the height of the #click div */
+  outline: 0; /* to remove outline when focused */
+  z-index: 900;
+}
+
+#commands-in input {
+  border: 2px #0a0 solid;
+  background: rgba(0,0,0,0);
+  width: 100%;
+  height: 100%; 
+}
+
+#start-div {
+  width: 100%;
+  height: 100%;
+  position: absolute; /* to align it to right and positon it over the input */
+  top: 0;
+  right: 0;
+  z-index: -2;
 }
