@@ -275,6 +275,111 @@ function spawn(block)
 
 
 /**
+ * rotateBlock function to rotate a block
+ *
+ * @param block the block bool[][] to rotate
+ * @param clockwise rotation direction, true if clockwise
+ * @return the rotated block
+ */
+function rotateBlock(block, clockwise)
+{
+  var newBlock = [];
+  for(var i = 0; i < block[0].length; i++)
+  {
+    var row = new Array();
+    for(var j = 0; j < block.length; j++)
+    { row.push(false); }
+    newBlock.push(row);
+  }
+
+  if (clockwise)
+  {
+    for (var col = 0; col < block[0].length; col++)
+    {
+      var rowNewB = 0
+      for (var rowB = block.length - 1; rowB >= 0; rowB--)
+      { 
+        newBlock[col][rowNewB] = block[rowB][col];
+        rowNewB++;
+      }
+    }
+  }
+  else
+  {
+    for (var row = 0; row < block.length; row++)
+    {
+      var colNewB = 0;
+      for (var colB = block[0].length - 1; colB >= 0; colB--)
+      {
+        newBlock[colNewB][row] = block[row][colB];
+        colNewB++;
+      }
+    }
+  }
+  return newBlock;
+}
+
+/**
+ * substitute method to check if a rotated block is valid, and substitute the
+ *            previous one.
+ *
+ * @param pos_xy starting coordinates of block
+ * @param block the block to be substituted
+ * @param rotatedBlock the block which has to substitute the other
+ * @return true if the substitution has been done
+ */
+function substitute(pos_xy, block, rotatedBlock) {
+  // remove block
+  for (var row = 0; row < block.length; row++)
+  {
+    for (var col = 0; col < block[0].length; col++)
+    {
+      if (block[row][col] == true)
+      { field_mat[pos_xy[Y] + row][pos_xy[X] + col] = false; }
+    }
+  }
+  // try to place new block
+  var counterMoveable = 0;
+  for (var row = 0; row < rotatedBlock.length; row++)
+  {
+    for (var col = 0; col < rotatedBlock[0].length; col++)
+    {
+      if (rotatedBlock[row][col] == true)
+      {
+        if (field_mat[pos_xy[Y] + row][pos_xy[X] + col] == false)
+        { counterMoveable++; }
+      }
+      else
+      { counterMoveable++; }
+    }
+  }
+  if (counterMoveable == rotatedBlock.length * rotatedBlock[0].length)
+  {
+    for (var row = 0; row < rotatedBlock.length; row++)
+    {
+      for (var col = 0; col < rotatedBlock[0].length; col++)
+      {
+        if (rotatedBlock[row][col] == true)
+        { field_mat[pos_xy[1] + row][pos_xy[0] + col] = rotatedBlock[row][col]; }
+      }
+    }
+    return true;
+  }
+  else
+  {
+    for (var row = 0; row < rotatedBlock.length; row++)
+    {
+      for (var col = 0; col < rotatedBlock[0].length; col++)
+      {
+        if (block[row][col] == true)
+        { field_mat[pos_xy[Y] + row][pos_xy[X] + col] = block[row][col]; }
+      }
+    }
+    return false;
+  }
+}
+
+/**
  * move
  *
  * @param moveChar the kind of move to be done
@@ -296,11 +401,22 @@ function move(moveChar, pos_xy, block)
         {
           if (block[row][col] == true && first)
           {
-            
-            // BUG ToBeSolved
-            
             first = false;
-            if (field_mat[pos_xy[1] + row][pos_xy[0] + col - 1] == false)
+
+            var rowPossibleShift = true;
+            if (field_mat[pos_xy[Y] + row][pos_xy[X] + col - 1] == true)
+            { rowPossibleShift = false; }
+
+            for (var c1 = col; c1 < block[0].length -1; c1++ )
+            {
+              if (block[row][c1] == false && block[row][c1+1] == true)
+              {
+                if (field_mat[pos_xy[Y] + row][pos_xy[X] + c1] == true)
+                { rowPossibleShift = false; }
+              }
+            }
+
+            if (rowPossibleShift)
             { counterMoveable++; }
           }
         }
@@ -316,8 +432,8 @@ function move(moveChar, pos_xy, block)
           {
             if (block[row][col] == true)
             {
-              field_mat[pos_xy[1] + row][pos_xy[0] + col - 1] = true;
-              field_mat[pos_xy[1] + row][pos_xy[0] + col] = false;
+              field_mat[pos_xy[Y] + row][pos_xy[X] + col - 1] = true;
+              field_mat[pos_xy[Y] + row][pos_xy[X] + col] = false;
             }
           }
         }
@@ -336,11 +452,22 @@ function move(moveChar, pos_xy, block)
         {
           if (block[row][col] == true && first)
           {
-            
-            // BUG ToBeSolved
-            
             first = false;
-            if (field_mat[pos_xy[1] + row - 1][pos_xy[0] + col] == false)
+
+            var colPossibleShift = true;
+            if (field_mat[pos_xy[Y] + row - 1][pos_xy[X] + col] == true)
+            { colPossibleShift = false; }
+
+            for (var r1 = row; r1 < block.length -1; r1++ )
+            {
+              if (block[r1][col] == false && block[r1+1][col] == true)
+              {
+                if (field_mat[pos_xy[Y] + r1][pos_xy[X] + col] == true)
+                { colPossibleShift = false; }
+              }
+            }
+
+            if (colPossibleShift)
             { counterMoveable++; }
           }
         }
@@ -356,8 +483,8 @@ function move(moveChar, pos_xy, block)
           {
             if (block[row][col] == true)
             {
-              field_mat[pos_xy[1] + row - 1][pos_xy[0] + col] = true;
-              field_mat[pos_xy[1] + row][pos_xy[0] + col] = false;
+              field_mat[pos_xy[Y] + row - 1][pos_xy[X] + col] = true;
+              field_mat[pos_xy[Y] + row][pos_xy[X] + col] = false;
             }
           }
         }
@@ -377,7 +504,21 @@ function move(moveChar, pos_xy, block)
           if (block[row][col] == true && first)
           {
             first = false;
-            if (field_mat[pos_xy[1] + row + 1][pos_xy[0] + col] == false)
+
+            var colPossibleShift = true;
+            if (field_mat[pos_xy[Y] + row + 1][pos_xy[X] + col] == true)
+            { colPossibleShift = false; }
+
+            for (var r1 = row; r1 > 0; r1-- )
+            {
+              if (block[r1][col] == false && block[r1-1][col] == true)
+              {
+                if (field_mat[pos_xy[Y] + r1][pos_xy[X] + col] == true)
+                { colPossibleShift = false; }
+              }
+            }
+
+            if (colPossibleShift)
             { counterMoveable++; }
           }
         }
@@ -408,9 +549,24 @@ function move(moveChar, pos_xy, block)
       for (var row = 0; row < block.length; row++) {
         var first = true;
         for (var col = block[0].length - 1; col >= 0; col--) {
-          if (block[row][col] == true && first) {
+          if (block[row][col] == true && first)
+          {
             first = false;
-            if (field_mat[pos_xy[1] + row][pos_xy[0] + col + 1] == false)
+
+            var rowPossibleShift = true;
+            if (field_mat[pos_xy[Y] + row][pos_xy[X] + col + 1] == true)
+            { rowPossibleShift = false; }
+
+            for (var c1 = col; c1 > 0; c1-- )
+            {
+              if (block[row][c1] == false && block[row][c1-1] == true)
+              {
+                if (field_mat[pos_xy[Y] + row][pos_xy[X] + c1] == true)
+                { rowPossibleShift = false; }
+              }
+            }
+
+            if (rowPossibleShift)
             { counterMoveable++; }
           }
         }
@@ -426,41 +582,43 @@ function move(moveChar, pos_xy, block)
           {
             if (block[row][col] == true)
             {
-              field_mat[pos_xy[1] + row][pos_xy[0] + col + 1] = true;
-              field_mat[pos_xy[1] + row][pos_xy[0] + col] = false;
+              field_mat[pos_xy[Y] + row][pos_xy[X] + col + 1] = true;
+              field_mat[pos_xy[Y] + row][pos_xy[X] + col] = false;
             }
           }
         }
-        // ho mosso il pezzo: modifico la posizione del pezzo:
-        pos_xy[0]++;
+        pos_xy[X]++;
       }
       else
       { return false; }
       break;
-//    case 'k': // ruota in senso antiorario
-//      // creo il pezzo girato
-//      boolean pezzoGiratoA[][] = ruotaPezzo(pezzo, false);
-//      try {
-//        sostituisciPezzo(pos_xy, pezzo, pezzoGiratoA);
-//        pezzo = pezzoGiratoA;
-//      } catch (MossaImpossibileException excA) {
-//        throw excA;
-//      }
-//      break;
-//    case 'l': // ruota in senso orario
-//      boolean pezzoGiratoO[][] = ruotaPezzo(pezzo, true);
-//      try {
-//        sostituisciPezzo(pos_xy, pezzo, pezzoGiratoO);
-//        pezzo = pezzoGiratoO;
-//      } catch (MossaImpossibileException excO) {
-//        throw excO;
-//      }
-//      break;
-    case 'o': // ferma il pezzo
+
+    case CLOCK: // *************************************************************
+      var rotatedBlock = rotateBlock(block, true);
+      var resultOk = substitute(pos_xy, block, rotatedBlock);
+      if (resultOk)
+      {
+        block = [];
+        for (var i = 0; i < rotatedBlock.length; i++)
+        { block.push(rotatedBlock[i]); }
+        break;
+      }
+      else
+      { return false; }
+    case CNTCL: // *************************************************************
+      var rotatedBlock = rotateBlock(block, false);
+      var resultOk = substitute(pos_xy, block, rotatedBlock);
+      if (resultOk)
+      {
+        block = [];
+        for (var i = 0; i < rotatedBlock.length; i++)
+        { block.push(rotatedBlock[i]); }
+        break;
+      }
+      else
+      { return false; }
+    case 'o': 
       // non faccio niente, il pezzo viene fermato dove è.
-      break;
-    case 'X': // esci
-      // non faccio niente, il main si occupa di terminare la partita
       break;
     default:
       console.log('minchione');
