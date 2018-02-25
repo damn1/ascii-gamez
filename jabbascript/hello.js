@@ -32,35 +32,6 @@ var name = 'damn';
 var score = '0';
 var blocks_counter = '0';
 
-
-/**
- * init initialization function to create field and first block.
- */
-function init()
-{
-  // init field to void
-  for(var i = 0; i < MIN_ROW; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < MIN_COL; j++)
-    { row.push(false); }
-    field_mat.push(row);
-  }
-
-  // init next block to void
-  for(var i = 0; i < MAX_ROW_B; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < MAX_COL_B; j++)
-    { row.push(false); }
-    next_mat.push(row);
-    curr_mat.push(row);
-  }
-  curr_pos.push(0);
-  curr_pos.push(0);
-}
-
-
 /**
  * toStringField method to build the field as a string starting from the field
  *               as a matrix.
@@ -318,6 +289,7 @@ function rotateBlock(block, clockwise)
   }
   return newBlock;
 }
+
 
 /**
  * substitute method to check if a rotated block is valid, and substitute the
@@ -627,7 +599,35 @@ function move(moveChar, pos_xy, block)
   return true;
 }
 
-init();
+
+/**
+ * init initialization function to create field and first block.
+ */
+function init()
+{
+  // init field to void
+  for(var i = 0; i < MIN_ROW; i++)
+  {
+    var row = new Array();
+    for(var j = 0; j < MIN_COL; j++)
+    { row.push(false); }
+    field_mat.push(row);
+  }
+
+  // init next block to void
+  for(var i = 0; i < MAX_ROW_B; i++)
+  {
+    var row = new Array();
+    for(var j = 0; j < MAX_COL_B; j++)
+    { row.push(false); }
+    next_mat.push(row);
+    curr_mat.push(row);
+  }
+  curr_pos.push(0);
+  curr_pos.push(0);
+  next_mat = genBlock();
+}
+
 var curr_pos_back = [-1, -1];
 
 var fallingBlock = function() {
@@ -646,13 +646,16 @@ var fallingBlock = function() {
 }
 
 
+init();
+
 /**
  * Vue.js application to rule the game.
  */ 
 var app = new Vue({
   el: '#tetris-app',
 
-  data: {
+  data:
+  {
     intro: '' +
     '██████  ██████  ██████  ██████  ██  ██████\n' +
     '  ██    ████      ██    ██  ██  ██  ██    \n' +
@@ -678,7 +681,8 @@ var app = new Vue({
     name: ''
   },
 
-  methods: {
+  methods:
+  {
     keymonitor: function(event)
     {
       console.log(event.key);
@@ -689,7 +693,6 @@ var app = new Vue({
     {
       // `this` inside methods points to the Vue instance
       playing = true;
-      next_mat = genBlock();
       curr_mat = next_mat;
       next_mat = genBlock();
       curr_pos[X] = spawn(curr_mat);
@@ -702,6 +705,7 @@ var app = new Vue({
     }
   }
 });
+
 
 window.setInterval(function(){
   fallingBlock();
