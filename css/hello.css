@@ -112,7 +112,8 @@ input, button {
   color: #0a0;
 }
 
-#bj-icon, #tetris-icon {
+/* these element ids are defined in vue component ascii-nav-link */
+#ascii-blackjack-icon, #ascii-tetris-icon {
   height: 56px;
   width: 56px;
   fill: #0a0;
