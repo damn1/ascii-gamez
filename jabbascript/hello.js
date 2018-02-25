@@ -623,10 +623,28 @@ function move(moveChar, pos_xy, block)
     default:
       console.log('minchione');
   }
+  curr_mat = block;
   return true;
 }
 
 init();
+var curr_pos_back = [-1, -1];
+
+var fallingBlock = function() {
+  if (curr_pos_back[X] !== curr_pos[X] ||
+      curr_pos_back[Y] !== curr_pos[Y])
+  {
+    curr_pos_back[X] = curr_pos[X];
+    curr_pos_back[Y] = curr_pos[Y];
+    move(DOWN, curr_pos, curr_mat); 
+  }
+  else
+  {
+    console.log('fixed!!');
+    curr_pos_back = [-1, -1];
+  }
+}
+
 
 /**
  * Vue.js application to rule the game.
@@ -661,20 +679,31 @@ var app = new Vue({
   },
 
   methods: {
-    keymonitor: function(event) {
+    keymonitor: function(event)
+    {
       console.log(event.key);
       move(event.key, curr_pos, curr_mat);
       this.field_str_vue = toStringField();
     },
-    startMatch: function() {
+    startMatch: function()
+    {
       // `this` inside methods points to the Vue instance
       playing = true;
-      console.log(playing);
+      next_mat = genBlock();
       curr_mat = next_mat;
       next_mat = genBlock();
       curr_pos[X] = spawn(curr_mat);
       curr_pos[Y] = 0;
       this.field_str_vue = toStringField();
+    },
+    updateField: function()
+    {
+      this.field_str_vue = toStringField();
     }
   }
 });
+
+window.setInterval(function(){
+  fallingBlock();
+  app.updateField();
+}, 1000);
