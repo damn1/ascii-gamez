@@ -352,6 +352,76 @@ function substitute(pos_xy, block, rotatedBlock) {
 }
 
 /**
+ *
+ */
+function isBlankCol(col, block)
+{
+  for (var row = 0; row < block.length; row++)
+  {
+    if (block[row][col])
+    { return false; }
+  }
+  return true;
+}
+
+
+/**
+ *
+ */
+function isBlankRow(row, block)
+{
+  for (var col = 0; col < block[0].length; col++)
+  {
+    if (block[row][col])
+    { return false; }
+  }
+  return true;
+}
+
+
+/**
+ * moveable function to check if there is enough space in the field to move a
+ *          block in a certain direction.
+ *
+ * @param moveChar the kind of move
+ * @param block the block to move
+ * @return true if the move can be done
+ */
+function moveable(moveChar, block)
+{
+  switch (moveChar)
+  {
+    case LEFT:
+      if (curr_pos[X] > 0)
+      { return true; }
+      if (isBlankCol(-curr_pos[X], block))
+      { return true; }
+      return false;
+    case RIGHT:
+      if (curr_pos[X] < field_mat[0].length - block[0].length)
+      { return true; }
+      if (isBlankCol(field_mat[0].length - curr_pos[X] - 1, block))
+      { return true; }
+      return false;
+    case UP:
+      if (curr_pos[Y] > 0)
+      { return true; }
+      if (isBlankRow(-curr_pos[Y], block))
+      { return true; }
+      return false;
+    case DOWN:
+      if (curr_pos[Y] < field_mat.length - block.length)
+      { return true; }
+      if (isBlankRow(field_mat.length - curr_pos[Y] - 1, block))
+      { return true; }
+      return false;
+    default:
+      return false;
+  }
+}
+
+
+/**
  * move
  *
  * @param moveChar the kind of move to be done
@@ -365,6 +435,9 @@ function move(moveChar, pos_xy, block)
   switch (moveChar)
   {
     case LEFT: // **************************************************************
+      if (!moveable(LEFT, block)) 
+      { break; }
+
       counterMoveable = 0;
       for (var row = 0; row < block.length; row++)
       {
@@ -416,6 +489,9 @@ function move(moveChar, pos_xy, block)
       break;
 
     case UP: // ****************************************************************
+      if (!moveable(UP, block)) 
+      { break; }
+
       counterMoveable = 0;
       for (var col = block[0].length - 1; col >= 0; col--)
       {
@@ -467,6 +543,9 @@ function move(moveChar, pos_xy, block)
       break;
 
     case DOWN: // **************************************************************
+      if (!moveable(DOWN, block)) 
+      { break; }
+
       counterMoveable = 0;
       for (var col = block[0].length - 1; col >= 0; col--)
       {
@@ -517,6 +596,9 @@ function move(moveChar, pos_xy, block)
       break;
 
     case RIGHT: // *************************************************************
+      if (!moveable(RIGHT, block)) 
+      { break; }
+
       counterMoveable = 0;
       for (var row = 0; row < block.length; row++) {
         var first = true;
@@ -648,11 +730,90 @@ var fallingBlock = function() {
 
 init();
 
+var tetris_data = {
+    intro: '' +
+      '██████  ██████  ██████  ██████  ██  ██████\n' +
+      '  ██    ████      ██    ██  ██  ██  ██    \n' +
+      '  ██    ██        ██    ████    ██      ██\n' +
+      '  ██    ██████    ██    ██  ██  ██  ██████\n' +
+      '            ascii tetris by damn1         \n',
+    start: '' +
+      '┌─────────────┐\n' +
+      '     START     \n' +
+      '└─────────────┘\n',
+    field_str_vue: toStringField(),
+    commands: '' +
+      '┌───┬───┐\n' +
+      '│ ' + t_cntcl + ' │ ' + t_clock + ' │\n' +
+      '└───┴───┘\n' +
+      '   ┌───┬───┬───┐\n' +
+      '   │ ' + s_left + ' │ ' + s_down + ' │ ' + s_right + ' │\n' +
+      '   └───┴───┴───┘\n',
+    score: 0,
+    blocks_counter: 0,
+    name: ''
+}
+
+var asciiTetrisComponent = Vue.component('ascii-tetris', {
+  template: '' +
+    '  <div id="app-tetris"> ' +
+    '    <div class="row"> ' +
+    '      <div class="game-intro"> ' +
+    '        <pre>{{ intro }}</pre> ' +
+    '      </div> ' +
+    '    </div> ' +
+    '    <div class="row"> ' +
+    '      <div id="start-container" class="game-intro col-sm-2"> ' +
+    '        <div id="start-div"> ' +
+    '          <pre>{{ start }}</pre> ' +
+    '        </div> ' +
+    '        <div id="commands-in"> ' +
+    '          <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch"> ' +
+    '        </div> ' +
+    '      </div> ' +
+    '      <div class="game-intro col-sm-8"> ' +
+    '        <pre>{{ field_str_vue }}</pre> ' +
+    '      </div> ' +
+    '      <div class="game-intro col-sm-2"> ' +
+    '        <input type="color" id="color-picker" onchange="clickColor(0, -1, -1, 5)" value="#00aa00"> ' +
+    '        <pre>{{ commands }}</pre> ' +
+    '      </div> ' +
+    '    </div> ' +
+    '  </div> ',
+  data: function()
+  {
+    return tetris_data;
+  },
+  methods:
+  {
+    keymonitor: function(event)
+    {
+      console.log(event.key);
+      move(event.key, curr_pos, curr_mat);
+      this.field_str_vue = toStringField();
+    },
+    startMatch: function()
+    {
+      // `this` inside methods points to the Vue instance
+      playing = true;
+      curr_mat = next_mat;
+      next_mat = genBlock();
+      curr_pos[X] = spawn(curr_mat);
+      curr_pos[Y] = 0;
+      this.field_str_vue = toStringField();
+    },
+    updateField: function()
+    {
+      this.field_str_vue = toStringField();
+    }
+  }
+});
+
 /**
  * Vue.js application to rule the game.
  */ 
 var app = new Vue({
-  el: '#tetris-app',
+  el: '#app-tetris',
 
   data:
   {
@@ -709,5 +870,5 @@ var app = new Vue({
 
 window.setInterval(function(){
   fallingBlock();
-  app.updateField();
+  appMain.$refs.asciiTetrisComponent.updateField();
 }, 1000);

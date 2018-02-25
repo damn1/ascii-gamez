@@ -16,63 +16,31 @@
   </head>
 
   <body>
+    <div id="app-main">
+      <ascii-nav></ascii-nav>
 
-    <div id="tetris-app">
-      <div class="row">
-        <div class="game-intro">
-          <pre>{{ intro }}</pre>
-        </div>
-      </div>
+      <!-- the ref is a vue directive that enables me to access component's
+      methods from outside -->
+      <ascii-tetris ref="asciiTetrisComponent"></ascii-tetris>
 
-      <div class="row">
-
-        <div id="start-container" class="game-intro col-sm-2">
-          <div id="start-div">
-            <pre>{{ start }}</pre>
-          </div>
-          <div id="commands-in">
-            <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch">
-          </div>
-        </div>
-
-
-        <div class="game-intro col-sm-8">
-          <pre>{{ field_str_vue }}</pre>
-        </div>
-
-        <div class="game-intro col-sm-2">
-          <pre>{{ commands }}</pre>
-        </div>
-      </div>
-
+      <ascii-foot></ascii-foot>
     </div>
-    
-    <div class="footer">
-      <a href="msdsolutions8@gmail.com">
-        <span class="contacts">
-          <img id="githublogo" class="svg" src="./assets/icons/001-github-logo.svg"></img>
-        </span>
-      </a>
-      <a href="msdsolutions8@gmail.com">
-        <span class="contacts">
-          <p>damn1</p>
-        </span>
-      </a>
-
-    </div>
-
 
     <!-- Vue.js -->
     <script src="https://unpkg.com/vue"></script>
-  
+
+    <!-- my script -->
+    <script src="jabbascript/hello.js"></script>
+    <script src="jabbascript/ascii-nav-component.js"></script>
+    <script src="jabbascript/ascii-foot-component.js"></script>
+    <script src="jabbascript/app-main.js"></script>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  
-      <!-- my script -->
-    <script src="jabbascript/hello.js"></script>
+
     <script src="jabbascript/svg-trick.js"></script>
 
   </body>

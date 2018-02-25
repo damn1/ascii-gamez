@@ -56,6 +56,12 @@ input, button {
   z-index: -2;
 }
 
+#color-picker {
+  width: 85%; 
+  background-color: black;
+}
+
+/* ------------------------------- FOOTER CSS ------------------------------- */
 .footer {
   text-align: right;
   color: ghostwhite;
@@ -86,4 +92,28 @@ input, button {
   margin-top: 8px;
   /* for footer text: */
   color: white;
+}
+
+/* ------------------------------- NAVBAR CSS ------------------------------- */
+.navbar {
+  width: 100%;
+  display: flex;
+
+}
+
+.navbar .nav-link {
+  width: 150px;
+  text-align: center;
+  margin-left: 20px;
+  flex-grow: 1;
+}
+
+.navbar .nav-link p {
+  color: #0a0;
+}
+
+#bj-icon, #tetris-icon {
+  height: 56px;
+  width: 56px;
+  fill: #0a0;
 }
