@@ -754,6 +754,10 @@ var tetris_data = {
     name: ''
 }
 
+
+/**
+ * asciiTetrisComponent Vue.js component that hold the tetris application.
+ */ 
 var asciiTetrisComponent = Vue.component('ascii-tetris', {
   template: '' +
     '  <div id="app-tetris"> ' +
@@ -773,10 +777,6 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     '      </div> ' +
     '      <div class="game-intro col-sm-8"> ' +
     '        <pre>{{ field_str_vue }}</pre> ' +
-    '      </div> ' +
-    '      <div class="game-intro col-sm-2"> ' +
-    '        <input type="color" id="color-picker" onchange="clickColor(0, -1, -1, 5)" value="#00aa00"> ' +
-    '        <pre>{{ commands }}</pre> ' +
     '      </div> ' +
     '    </div> ' +
     '  </div> ',
@@ -808,65 +808,6 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     }
   }
 });
-
-/**
- * Vue.js application to rule the game.
- */ 
-var app = new Vue({
-  el: '#app-tetris',
-
-  data:
-  {
-    intro: '' +
-    '██████  ██████  ██████  ██████  ██  ██████\n' +
-    '  ██    ████      ██    ██  ██  ██  ██    \n' +
-    '  ██    ██        ██    ████    ██      ██\n' +
-    '  ██    ██████    ██    ██  ██  ██  ██████\n' +
-    '            ascii tetris by damn1         \n',
-    start: '' +
-    '┌─────────────┐\n' +
-    '     START     \n' +
-    '└─────────────┘\n',
-    field_str_vue: toStringField(),
-    commands: '' +
-    '┌───┬───┐\n' +
-    '│ ' + t_cntcl + ' │ ' + t_clock + ' │\n' +
-    '└───┴───┘\n' +
-    '   ┌───┬───┬───┐\n' +
-    '   │ ' + s_left + ' │ ' + s_down + ' │ ' + s_right + ' │\n' +
-    '   └───┴───┴───┘\n',
-
-    // pieces random geneation:
-    score: 0,
-    blocks_counter: 0,
-    name: ''
-  },
-
-  methods:
-  {
-    keymonitor: function(event)
-    {
-      console.log(event.key);
-      move(event.key, curr_pos, curr_mat);
-      this.field_str_vue = toStringField();
-    },
-    startMatch: function()
-    {
-      // `this` inside methods points to the Vue instance
-      playing = true;
-      curr_mat = next_mat;
-      next_mat = genBlock();
-      curr_pos[X] = spawn(curr_mat);
-      curr_pos[Y] = 0;
-      this.field_str_vue = toStringField();
-    },
-    updateField: function()
-    {
-      this.field_str_vue = toStringField();
-    }
-  }
-});
-
 
 window.setInterval(function(){
   fallingBlock();

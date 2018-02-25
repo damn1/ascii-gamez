@@ -10,6 +10,7 @@
 
     <!-- my style sheet -->
     <link rel="stylesheet" href="css/hello.css">
+    <link rel="stylesheet" href="css/tetris-input.css">
 
     <title>Hello, world!</title>
 
@@ -19,13 +20,72 @@
     <div id="app-main">
       <ascii-nav></ascii-nav>
 
-      <!-- the ref is a vue directive that enables me to access component's
-      methods from outside -->
+      <!-- the ref is a vue directive that enables me to access component's methods from outside -->
       <ascii-tetris ref="asciiTetrisComponent"></ascii-tetris>
 
       <ascii-foot></ascii-foot>
     </div>
 
+
+    <div id=provv-app style="height: 400px;">
+      <div class="col-sm-4 tetris-input-container">
+        <div class="row">
+          <div class="col-sm-6">
+            <label for="input-rows">Rows:</label>
+          </div>
+          <div class="col-sm-6 right">
+            <input id="input-rows" class="tetris-input" type="number" value="6">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <label for="input-rows">Cols:</label>
+          </div>
+          <div class="col-sm-6 right">
+            <input id="input-cols" class="tetris-input" type="number" value="8">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <label for="input-rows">Color:</label>
+          </div>
+          <div class="col-sm-6 right">
+            <input type="color" id="color-picker" onchange="clickColor(0, -1, -1, 5)" value="#00aa00">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <pre class="command-label">{{ commands2 }}</pre>
+          </div>
+          <div class="col-sm-6 right">
+            <pre> </pre>
+            <input id="input-left" class="tetris-command" type="text" value="a">
+            <input id="input-down" class="tetris-command" type="text" value="s">
+            <input id="input-right" class="tetris-command" type="text" value="d">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <pre class="command-label">{{ commands1 }}</pre>
+          </div>
+          <div class="col-sm-6 right">
+            <pre>      </pre>
+            <input id="input-cntclck" class="tetris-command" type="text" value="k">
+            <input id="input-clock" class="tetris-command" type="text" value="l">
+          </div>
+        </div>
+        <div id="start-container" class="row">
+          <div id="start-label-container" class="col-sm-12">
+            <pre class="command-label start">{{ start }}</pre>
+          </div>
+          <div id="start-input-container">
+            <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch">
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Vue.js -->
     <script src="https://unpkg.com/vue"></script>
 
@@ -34,6 +94,7 @@
     <script src="jabbascript/nav-component.js"></script>
     <script src="jabbascript/foot-component.js"></script>
     <script src="jabbascript/app-main.js"></script>
+    <script src="jabbascript/provv-app.js"></script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

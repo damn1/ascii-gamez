@@ -1,0 +1,72 @@
+.tetris-input-container pre.command-label {
+  margin-bottom: 0px;
+}
+
+.tetris-input-container #color-picker,
+.tetris-input-container .tetris-input,
+.tetris-input-container .tetris-command {
+  color: ghostwhite;
+  width: 36px;
+  height: 30px;
+  background-color: black;
+  border: 1px solid ghostwhite;
+  text-align: center;
+}
+
+.tetris-input-container {
+  color: #0a0;
+}
+
+.tetris-input-container .row {
+  margin-bottom: 3px;
+}
+
+.tetris-input-container .row .col-sm-6,
+.tetris-input-container .row .col-sm-12 {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.right {
+  text-align: right;
+}
+
+pre.start {
+  color: ghostwhite;
+}
+
+/* CSS for commands during the match: there is an <input> element overlapped to
+ * the 'start' command. We don't want this input to be visibile. */
+#start-container {
+  width: 100%;
+  margin: auto;
+  height: 50px;
+  padding-left: 6px;
+  padding-right: 6px;
+  position: relative; /* for absolute child element */
+  display: inline-block; /* to take the width of the input */
+}
+
+#start-input-container {
+  text-align: left;
+  width: 100%;
+  height: 100%; /* added to match the height of the #click div */
+  outline: 0; /* to remove outline when focused */
+  z-index: 900;
+}
+
+#start-input-container input {
+  border: 2px #040 solid;
+  background: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+  width: 100%;
+  height: 100%; 
+}
+
+#start-label-container {
+  text-align: center; /* centers the <pre> */
+  position: absolute; /* to align it to right and positon it over the input */
+  top: 0;
+  right: 0;
+  z-index: -2;
+}
