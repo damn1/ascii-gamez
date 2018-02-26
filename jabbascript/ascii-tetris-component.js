@@ -1,37 +1,3 @@
-const PIXEL_PROBABILITY = 0.6;
-const X = 0;
-const Y = 1;
-// field constants:
-const MIN_ROW = 6;
-const MIN_COL = 8;
-// pieces constants:
-const MAX_ROW_B = 3;
-const MAX_COL_B = 3;
-
-const LEFT  = 'a';
-const RIGHT = 'd';
-const DOWN  = 's';
-const UP    = 'w';
-const CLOCK = 'l';
-const CNTCL = 'k';
-
-// boolean matrices for field and next
-var field_mat = [];
-var next_mat = [];
-var curr_mat = [];
-var curr_pos = [];
-
-const t_clock = '↻';
-const t_cntcl  = '↺';
-const s_right = '→';
-const s_left  = '←';
-const s_down  = '↓';
-
-var playing = false;
-var name = 'damn';
-var score = '0';
-var blocks_counter = '0';
-
 /**
  * toStringField method to build the field as a string starting from the field
  *               as a matrix.
@@ -53,7 +19,7 @@ function toStringField()
   field_str += ' *││';
   for (var c = 0; c < field_mat[0].length; c++)
   {
-    field_str += (c == field_mat[0].length / 2 - 4) ? 'D4MN T E T R I S' : '  ';
+    field_str += (c == field_mat[0].length / 2 - 4) ? 'd4mn1T E T R I S' : '  ';
     if (c == field_mat[0].length / 2 - 4)
     { c += 7; }
   }
@@ -731,27 +697,20 @@ var fallingBlock = function() {
 init();
 
 var tetris_data = {
-    intro: '' +
-      '██████  ██████  ██████  ██████  ██  ██████\n' +
-      '  ██    ████      ██    ██  ██  ██  ██    \n' +
-      '  ██    ██        ██    ████    ██      ██\n' +
-      '  ██    ██████    ██    ██  ██  ██  ██████\n' +
-      '            ascii tetris by damn1         \n',
-    start: '' +
-      '┌─────────────┐\n' +
-      '     START     \n' +
-      '└─────────────┘\n',
-    field_str_vue: toStringField(),
-    commands: '' +
-      '┌───┬───┐\n' +
-      '│ ' + t_cntcl + ' │ ' + t_clock + ' │\n' +
-      '└───┴───┘\n' +
-      '   ┌───┬───┬───┐\n' +
-      '   │ ' + s_left + ' │ ' + s_down + ' │ ' + s_right + ' │\n' +
-      '   └───┴───┴───┘\n',
-    score: 0,
-    blocks_counter: 0,
-    name: ''
+  intro: '' +
+    '██████  ██████  ██████  ██████  ██  ██████\n' +
+    '  ██    ████      ██    ██  ██  ██  ██    \n' +
+    '  ██    ██        ██    ████    ██      ██\n' +
+    '  ██    ██████    ██    ██  ██  ██  ██████\n' +
+    '            ascii tetris by damn1         \n',
+  start: '' +
+    '┌─────────────┐\n' +
+    '     START     \n' +
+    '└─────────────┘\n',
+  field_str_vue: toStringField(),
+  score: 0,
+  blocks_counter: 0,
+  name: '',
 }
 
 
@@ -761,23 +720,20 @@ var tetris_data = {
 var asciiTetrisComponent = Vue.component('ascii-tetris', {
   template: '' +
     '  <div id="app-tetris"> ' +
+    '    <div class="container"> ' +
     '    <div class="row"> ' +
     '      <div class="game-intro"> ' +
     '        <pre>{{ intro }}</pre> ' +
     '      </div> ' +
     '    </div> ' +
     '    <div class="row"> ' +
-    '      <div id="start-container" class="game-intro col-sm-2"> ' +
-    '        <div id="start-div"> ' +
-    '          <pre>{{ start }}</pre> ' +
-    '        </div> ' +
-    '        <div id="commands-in"> ' +
-    '          <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch"> ' +
-    '        </div> ' +
-    '      </div> ' +
     '      <div class="game-intro col-sm-8"> ' +
     '        <pre>{{ field_str_vue }}</pre> ' +
     '      </div> ' +
+    '      <div class="col-sm-4"> ' +
+    '        <ascii-tetris-commands></ascii-tetris-commands>' +
+    '      </div> ' +
+    '    </div> ' +
     '    </div> ' +
     '  </div> ',
   data: function()
@@ -810,6 +766,9 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
 });
 
 window.setInterval(function(){
-  fallingBlock();
-  appMain.$refs.asciiTetrisComponent.updateField();
+  if (playing)
+  {
+    fallingBlock();
+    appMain.$refs.asciiTetrisComponent.updateField();      
+  }
 }, 1000);
