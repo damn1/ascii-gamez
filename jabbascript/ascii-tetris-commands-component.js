@@ -1,4 +1,4 @@
-const DEFAULT_COLOR = '#0a0';
+const DEFAULT_COLOR = '#00aa00';
 const PIXEL_PROBABILITY = 0.6;
 const X = 0;
 const Y = 1;
@@ -8,18 +8,26 @@ const MIN_COL = 8;
 // pieces constants:
 const MAX_ROW_B = 3;
 const MAX_COL_B = 3;
+// default values
+const LEFT_init  = 'a';
+const RIGHT_init = 'd';
+const DOWN_init  = 's';
+const UP_init    = 'w';
+const CLOCK_init = 'l';
+const CNTCL_init = 'k';
+// enum moves
+const LEFT  = 'left';
+const RIGHT = 'right';
+const DOWN  = 'down';
+const UP    = 'up';
+const CLOCK = 'clock';
+const CNTCL = 'counterclock';
 
-const LEFT  = 'a';
-const RIGHT = 'd';
-const DOWN  = 's';
-const UP    = 'w';
-const CLOCK = 'l';
-const CNTCL = 'k';
-
-// boolean matrices for field and next
+// boolean matrices for field, block, next block
 var field_mat = [];
-var next_mat = [];
-var curr_mat = [];
+var next_mat  = [];
+var curr_mat  = [];
+// (X,Y) position container
 var curr_pos = [];
 
 var playing = false;
@@ -46,7 +54,13 @@ var commandsData =
     '└───┴───┴───┘',
   rows: MIN_ROW,
   cols: MIN_COL,
-  color: DEFAULT_COLOR
+  color: DEFAULT_COLOR,
+  left  : LEFT_init ,
+  right : RIGHT_init,
+  down  : DOWN_init ,
+  up    : UP_init   ,
+  clock : CLOCK_init,
+  cntcl : CNTCL_init,
 }
 
 /* 
@@ -62,7 +76,7 @@ Vue.component('ascii-tetris-commands', {
   '          <label for="input-rows"><pre class="command-label">Rows</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-rows" class="tetris-input" type="number" v-bind:value="rows">' +
+  '          <input id="input-rows" class="tetris-input" type="number" v-model="rows">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -70,7 +84,7 @@ Vue.component('ascii-tetris-commands', {
   '          <label for="input-rows"><pre class="command-label">Cols</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-cols" class="tetris-input" type="number" v-bind:value="cols" >' +
+  '          <input id="input-cols" class="tetris-input" type="number" v-model="cols">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -78,7 +92,7 @@ Vue.component('ascii-tetris-commands', {
   '          <label for="input-rows"><pre class="command-label">Color</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input type="color" id="color-picker" v-on:click="clickColor()" v-bind:value="color">' +
+  '          <input type="color" id="color-picker" v-on:click="clickColor()" v-model="color">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -86,9 +100,9 @@ Vue.component('ascii-tetris-commands', {
   '          <pre class="command-label">{{ commandsTranslation }}</pre>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-left" class="tetris-command" type="text" value="a">' +
-  '          <input id="input-down" class="tetris-command" type="text" value="s">' +
-  '          <input id="input-right" class="tetris-command" type="text" value="d">' +
+  '          <input id="input-left"  class="tetris-command" type="text" maxlength="1" v-model="left">' +
+  '          <input id="input-down"  class="tetris-command" type="text" maxlength="1" v-model="down">' +
+  '          <input id="input-right" class="tetris-command" type="text" maxlength="1" v-model="right">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -96,8 +110,8 @@ Vue.component('ascii-tetris-commands', {
   '          <pre class="command-label">{{ commandsRotation }}</pre>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-cntclck" class="tetris-command" type="text" value="k">' +
-  '          <input id="input-clock" class="tetris-command" type="text" value="l">' +
+  '          <input id="input-cntcl" class="tetris-command" type="text" v-model="cntcl">' +
+  '          <input id="input-clock" class="tetris-command" type="text" v-model="clock">' +
   '        </div>' +
   '      </div>' +
   '      <div id="start-container" class="row">' +
@@ -118,7 +132,27 @@ Vue.component('ascii-tetris-commands', {
     keymonitor: function(event)
     {
       console.log(event.key);
-      move(event.key, curr_pos, curr_mat);
+      switch(event.key)
+      {
+        case this.left:
+          move(LEFT, curr_pos, curr_mat);
+          break;
+        case this.right:
+          move(RIGHT, curr_pos, curr_mat);
+          break;
+        case this.down:
+          move(DOWN, curr_pos, curr_mat);
+          break;
+        case this.up:
+          move(UP, curr_pos, curr_mat);
+          break;
+        case this.clock:
+          move(CLOCK, curr_pos, curr_mat);
+          break;
+        case this.cntcl:
+          move(CNTCL, curr_pos, curr_mat);
+          break;
+      }
       this.field_str_vue = toStringField();
     },
     startMatch: function()
@@ -129,6 +163,7 @@ Vue.component('ascii-tetris-commands', {
       next_mat = genBlock();
       curr_pos[X] = spawn(curr_mat);
       curr_pos[Y] = 0;
+      console.log(this.field_str_vue);
       this.field_str_vue = toStringField();
     },
     do: function()

@@ -107,10 +107,7 @@ function genBlock()
     }
     block.push(row);
   }
-  console.log(block);
   var first = Math.floor(Math.random() * MAX_ROW_B * MAX_COL_B);
-  console.log(Math.random());
-  console.log(first);
   var counter = 0;
   for (var i = 0; i < MAX_ROW_B; i++)
   {
@@ -651,22 +648,22 @@ function move(moveChar, pos_xy, block)
 /**
  * init initialization function to create field and first block.
  */
-function init()
+function init(fieldRows, fieldCols, blockRows, blockCols)
 {
   // init field to void
-  for(var i = 0; i < MIN_ROW; i++)
+  for(var i = 0; i < fieldRows; i++)
   {
     var row = new Array();
-    for(var j = 0; j < MIN_COL; j++)
+    for(var j = 0; j < fieldCols; j++)
     { row.push(false); }
     field_mat.push(row);
   }
 
   // init next block to void
-  for(var i = 0; i < MAX_ROW_B; i++)
+  for(var i = 0; i < blockRows; i++)
   {
     var row = new Array();
-    for(var j = 0; j < MAX_COL_B; j++)
+    for(var j = 0; j < blockCols; j++)
     { row.push(false); }
     next_mat.push(row);
     curr_mat.push(row);
@@ -694,7 +691,7 @@ var fallingBlock = function() {
 }
 
 
-init();
+init(MIN_ROW, MIN_COL, MAX_ROW_B, MAX_COL_B);
 
 var tetris_data = {
   intro: '' +
