@@ -57,10 +57,15 @@ pre {
   color: white;
 }
 
+#app-tetris { /* dont overlap footer to app container */
+  margin-bottom: 60px;
+}
+
 /* ------------------------------- NAVBAR CSS ------------------------------- */
 .navbar {
   width: 100%;
   display: flex;
+  background: #111;
 }
 
 .navbar .nav-link {

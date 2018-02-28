@@ -16,12 +16,31 @@ function toStringField()
   field_str += '┐│* ';
   field_str += '    Player    ' + ('         ' + name).slice(-9) + '\n';
 
+  // title row:
   field_str += ' *││';
+
+  if (Math.ceil(fieldTitle.length / 2) > field_mat[0].length)
+  {
+    console.log('il title non ci sta');
+    fieldTitle = ' ';
+  }
+  if (fieldTitle.length % 2 == 1)
+  { fieldTitle += ' '} // make length even
+  // find starting point based on length of the field
+  var startingAt = 0;
+  var surplus = (field_mat[0].length - (fieldTitle.length / 2));
+  startingAt = Math.floor(surplus / 2)
+
+  console.log(fieldTitle.length);
+  console.log(field_mat[0].length);
+  console.log(surplus);
+  console.log(startingAt);
+
   for (var c = 0; c < field_mat[0].length; c++)
   {
-    field_str += (c == field_mat[0].length / 2 - 4) ? 'd4mn1T E T R I S' : '  ';
-    if (c == field_mat[0].length / 2 - 4)
-    { c += 7; }
+    field_str += (c == startingAt) ? fieldTitle : '  ';
+    if (c == startingAt)
+    { c += (fieldTitle.length / 2 - 1); } // -1 because of c++
   }
   field_str += '││* \n'; //◣◢ maybe this in place of **
 
@@ -52,13 +71,13 @@ function toStringField()
       field_str = printBlockRow(counterRowNext, next_mat, field_str);
       field_str += '\n';
       counterRowNext++;
-      if (counterRowNext >= MAX_ROW_B)
+      if (counterRowNext >= rowsBlock)
       { printingNext = false; }
-    } else if (r == MAX_ROW_B + 4)
+    } else if (r == rowsBlock + 4)
     {
       /* qui si può aggiungere qualcosa all'interfaccia. */
       // in tal caso bisognerebbe incrementare il numero minimo di righe.
-      field_str += '\t';
+      field_str += '\t\n';
     }
     else
     { field_str += '\n'; }
@@ -98,29 +117,29 @@ function printBlockRow(row, block, field_str)
 function genBlock()
 {
   var block = [];
-  for(var i = 0; i < MAX_ROW_B; i++)
+  for(var i = 0; i < rowsBlock; i++)
   {
     var row = new Array();
-    for(var j = 0; j < MAX_COL_B; j++)
+    for(var j = 0; j < colsBlock; j++)
     {
       row.push(false);
     }
     block.push(row);
   }
-  var first = Math.floor(Math.random() * MAX_ROW_B * MAX_COL_B);
+  var first = Math.floor(Math.random() * rowsBlock * colsBlock);
   var counter = 0;
-  for (var i = 0; i < MAX_ROW_B; i++)
+  for (var i = 0; i < rowsBlock; i++)
   {
-    for (var j = 0; j < MAX_COL_B; j++)
+    for (var j = 0; j < colsBlock; j++)
     {
       if (first == counter)
       { block[i][j] = true; }
       counter++;
     }
   }
-  for (var i = 0; i < MAX_ROW_B; i++)
+  for (var i = 0; i < rowsBlock; i++)
   {
-    for (var j = 0; j < MAX_COL_B; j++)
+    for (var j = 0; j < colsBlock; j++)
     {
       if (adiacency(i, j, block))
       {
@@ -147,7 +166,7 @@ function adiacency(row, col, block) {
       if (block[row + 1][col])
       { return true; }
       break;
-    case MAX_ROW_B - 1:
+    case rowsBlock - 1:
       if (block[row - 1][col])
       { return true; }
       break;
@@ -160,7 +179,7 @@ function adiacency(row, col, block) {
       if (block[row][col + 1])
       { return true; }
       break;
-    case MAX_COL_B - 1:
+    case colsBlock - 1:
       if (block[row][col - 1])
       { return true; }
       break;
@@ -181,13 +200,13 @@ function adiacency(row, col, block) {
 function spawn(block)
 {
   // check for NxM free space starting from the left
-  for (var pos_x = 0; pos_x <= field_mat[0].length - MAX_COL_B; pos_x++) {
+  for (var pos_x = 0; pos_x <= field_mat[0].length - colsBlock; pos_x++) {
     // count free cells from pos_x
     // if ok, [pos_x][0] will be high left corner of the NxM free space
     var freeCount = 0;
-    for (var x = pos_x; x < pos_x + MAX_COL_B; x++)
+    for (var x = pos_x; x < pos_x + colsBlock; x++)
     {
-      for (var y = 0; y < MAX_ROW_B; y++)
+      for (var y = 0; y < rowsBlock; y++)
       {
         if (field_mat[y][x] == false)
         { freeCount++; }
@@ -196,9 +215,9 @@ function spawn(block)
 
     if (freeCount == block[0].length * block.length)
     {
-      for (var x = pos_x; x < pos_x + MAX_COL_B; x++)
+      for (var x = pos_x; x < pos_x + colsBlock; x++)
       {
-        for (var y = 0; y < MAX_ROW_B; y++)
+        for (var y = 0; y < rowsBlock; y++)
         { field_mat[y][x] = block[y][x - pos_x]; }
       }
       return pos_x;
@@ -350,9 +369,9 @@ function isBlankRow(row, block)
  * @param block the block to move
  * @return true if the move can be done
  */
-function moveable(moveChar, block)
+function moveable(move, block)
 {
-  switch (moveChar)
+  switch (move)
   {
     case LEFT:
       if (curr_pos[X] > 0)
@@ -392,10 +411,10 @@ function moveable(moveChar, block)
  * @param block the block to be moved
  * @return the modified block (e.g. if rotated)
  */
-function move(moveChar, pos_xy, block)
+function move(move, pos_xy, block)
 {
   var counterMoveable;
-  switch (moveChar)
+  switch (move)
   {
     case LEFT: // **************************************************************
       if (!moveable(LEFT, block)) 
@@ -644,35 +663,6 @@ function move(moveChar, pos_xy, block)
   return true;
 }
 
-
-/**
- * init initialization function to create field and first block.
- */
-function init(fieldRows, fieldCols, blockRows, blockCols)
-{
-  // init field to void
-  for(var i = 0; i < fieldRows; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < fieldCols; j++)
-    { row.push(false); }
-    field_mat.push(row);
-  }
-
-  // init next block to void
-  for(var i = 0; i < blockRows; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < blockCols; j++)
-    { row.push(false); }
-    next_mat.push(row);
-    curr_mat.push(row);
-  }
-  curr_pos.push(0);
-  curr_pos.push(0);
-  next_mat = genBlock();
-}
-
 var curr_pos_back = [-1, -1];
 
 var fallingBlock = function() {
@@ -690,8 +680,7 @@ var fallingBlock = function() {
   }
 }
 
-
-init(MIN_ROW, MIN_COL, MAX_ROW_B, MAX_COL_B);
+init(MIN_ROW, MIN_COL, DEFAULT_ROW_B, DEFAULT_COL_B);
 
 var tetris_data = {
   intro: '' +
@@ -700,10 +689,6 @@ var tetris_data = {
     '  ██    ██        ██    ████    ██      ██\n' +
     '  ██    ██████    ██    ██  ██  ██  ██████\n' +
     '            ascii tetris by damn1         \n',
-  start: '' +
-    '┌─────────────┐\n' +
-    '     START     \n' +
-    '└─────────────┘\n',
   field_str_vue: toStringField(),
   score: 0,
   blocks_counter: 0,
@@ -733,28 +718,16 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     '    </div> ' +
     '    </div> ' +
     '  </div> ',
+  components:
+  {
+    asciiTetrisCommandsComponent
+  },
   data: function()
   {
     return tetris_data;
   },
   methods:
   {
-    keymonitor: function(event)
-    {
-      console.log(event.key);
-      move(event.key, curr_pos, curr_mat);
-      this.field_str_vue = toStringField();
-    },
-    startMatch: function()
-    {
-      // `this` inside methods points to the Vue instance
-      playing = true;
-      curr_mat = next_mat;
-      next_mat = genBlock();
-      curr_pos[X] = spawn(curr_mat);
-      curr_pos[Y] = 0;
-      this.field_str_vue = toStringField();
-    },
     updateField: function()
     {
       this.field_str_vue = toStringField();
@@ -762,10 +735,10 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
   }
 });
 
-window.setInterval(function(){
-  if (playing)
-  {
-    fallingBlock();
-    appMain.$refs.asciiTetrisComponent.updateField();      
-  }
-}, 1000);
+//window.setInterval(function(){
+//  if (playing)
+//  {
+//    fallingBlock();
+//    appMain.$refs.asciiTetrisComponent.updateField();      
+//  }
+//}, 1000);
