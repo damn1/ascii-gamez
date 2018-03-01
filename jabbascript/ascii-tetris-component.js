@@ -9,7 +9,7 @@ function toStringField()
   var distance = '   ';
   for (var c = 0; c < curr_block[0].length; c++)
   { distance += '  '; }
-  
+
   var field_str = '  ┌─';
   for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '──'; }
@@ -28,7 +28,7 @@ function toStringField()
     fieldTitle = ' ';
   }
   if (fieldTitle.length % 2 == 1)
-  { fieldTitle += ' '} // make length even
+  { fieldTitle = ' ' + fieldTitle; } // make length even
   // find starting point based on length of the field
   var startingAt = 0;
   var surplus = (field_mat[0].length - (fieldTitle.length / 2));
@@ -69,7 +69,7 @@ function toStringField()
       field_str = printBlockRow(counterRowNext, next_block, field_str);
       field_str += '\n';
       counterRowNext++;
-      if (counterRowNext >= curr_block.length)
+      if (counterRowNext >= next_block.length)
       { printingNext = false; }
     } else if (r == curr_block.length + 4)
     {
@@ -665,21 +665,85 @@ function move(move, pos_xy, block)
   return true;
 }
 
-
-var curr_pos_back = [-1, -1];
-
-var fallingBlock = function() {
-  if (curr_pos_back[X] !== curr_pos[X] ||
-      curr_pos_back[Y] !== curr_pos[Y])
+/**
+ * scoreBlock function to count cells in a block.
+ *
+ * @param block the block to compute the score of
+ * @return the integer number of the 'true' cells in the block
+ */
+function scoreBlock(block)
+{
+  var cellCount = 0;
+  for (var r = 0; r < block.length; r++)
   {
-    curr_pos_back[X] = curr_pos[X];
-    curr_pos_back[Y] = curr_pos[Y];
-    move(DOWN, curr_pos, curr_block); 
+    for (var c = 0; c < block[0].length; c++)
+    {
+      if (block[r][c])
+      { cellCount++; }
+    }
   }
-  else
+  return cellCount;
+}
+
+/**
+ * cleanField function to clean field after a move: clean filled rows.
+ *
+ * @return an array containing the indices of the rows that are completed and
+ *         have been cleaned
+ */
+function cleanField()
+{
+  var rowsToClean = []
+  for (var row = field_mat.length - 1; row >= 0; row--)
   {
-    console.log('fixed!!');
-    curr_pos_back = [-1, -1];
+    var cellCounter = 0;
+    for (var col = 0; col < field_mat[row].length; col++)
+    {
+      if (field_mat[row][col] == true)
+      { cellCounter++; }
+    }
+
+    if (cellCounter == field_mat[row].length) // row to clean
+    {
+      rowsToClean.push(row);
+      for (var col = 0; col < field_mat[row].length; col++) {
+        field_mat[row][col] = false;
+      }
+    }
+  }
+  return rowsToClean;
+}
+
+/**
+ * adjustAfterClean function to adjust the field after some rows have been
+ *                  cleaned. Moves the blocks above the empty lines down.
+ *
+ * @param rowsClean the array returned from cleanField() function.
+ */
+function adjustAfterClean(rowsClean)
+{
+  if (rowsClean.length <= 0)
+  { return; }
+
+  for (var r = 0; r < rowsClean.length; r++)
+  {
+    score += (r + 1) * field_mat[0].length;
+    for (var rowC = rowsClean[r]; rowC >= 0; rowC--)
+    {
+      console.log("rowC" + rowC);
+      for (var c = 0; c < field_mat[rowC].length; c++)
+      {
+        console.log("c" + c);
+        if (rowC > 0)
+        { field_mat[rowC][c] = field_mat[rowC - 1][c]; }
+        else
+        { field_mat[rowC][c] = false; }
+      }
+    }
+
+    // update rows cleaned that have moved below
+    for (var r1 = r + 1; r1 < rowsClean.length; r1++)
+    { rowsClean[r1] = rowsClean[r1] + 1; }
   }
 }
 
@@ -687,11 +751,11 @@ init(MIN_ROW, MIN_COL, DEFAULT_ROW_B, DEFAULT_COL_B);
 
 var tetris_data = {
   intro: '' +
-    '██████  ██████  ██████  ██████  ██  ██████\n' +
-    '  ██    ████      ██    ██  ██  ██  ██    \n' +
-    '  ██    ██        ██    ████    ██      ██\n' +
-    '  ██    ██████    ██    ██  ██  ██  ██████\n' +
-    '            ascii tetris by damn1         \n',
+  '██████  ██████  ██████  ██████  ██  ██████\n' +
+  '  ██    ████      ██    ██  ██  ██  ██    \n' +
+  '  ██    ██        ██    ████    ██      ██\n' +
+  '  ██    ██████    ██    ██  ██  ██  ██████\n' +
+  '              damn1-ascii-tetris          \n',
   field_str_vue: toStringField(),
   // dynamic styling element, updated from events of child components
   dynamicColor: {
@@ -707,23 +771,23 @@ var tetris_data = {
  */ 
 var asciiTetrisComponent = Vue.component('ascii-tetris', {
   template: '' +
-    '  <div id="app-tetris"> ' +
-    '    <div class="container"> ' +
-    '    <div class="row"> ' +
-    '      <div class="game-intro"> ' +
-    '        <pre v-bind:style="dynamicColor">{{ intro }}</pre> ' +
-    '      </div> ' +
-    '    </div> ' +
-    '    <div class="row"> ' +
-    '      <div class="game-intro col-sm-8"> ' +
-    '        <pre  v-bind:style="dynamicColor">{{ field_str_vue }}</pre> ' +
-    '      </div> ' +
-    '      <div class="col-sm-4"> ' +
-    '        <ascii-tetris-commands @colorPick="onColorPickTetrisCommands"></ascii-tetris-commands>' +
-    '      </div> ' +
-    '    </div> ' +
-    '    </div> ' +
-    '  </div> ',
+  '  <div id="app-tetris"> ' +
+  '    <div class="container"> ' +
+  '    <div class="row"> ' +
+  '      <div class="game-intro"> ' +
+  '        <pre v-bind:style="dynamicColor">{{ intro }}</pre> ' +
+  '      </div> ' +
+  '    </div> ' +
+  '    <div class="row"> ' +
+  '      <div class="game-intro col-sm-8"> ' +
+  '        <pre  v-bind:style="dynamicColor">{{ field_str_vue }}</pre> ' +
+  '      </div> ' +
+  '      <div class="col-sm-4"> ' +
+  '        <ascii-tetris-commands @colorPick="onColorPickTetrisCommands"></ascii-tetris-commands>' +
+  '      </div> ' +
+  '    </div> ' +
+  '    </div> ' +
+  '  </div> ',
   components:
   {
     asciiTetrisCommandsComponent
@@ -741,7 +805,7 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     {
       this.field_str_vue = toStringField();
     },
-    
+
     /**
      * onColorPickTetrisCommands is invoked from an event emitted from child
      *                           <ascii-tetris-commands>, sets the color to the
@@ -755,11 +819,3 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     }
   }
 });
-
-//window.setInterval(function(){
-//  if (playing)
-//  {
-//    fallingBlock();
-//    appMain.$refs.asciiTetrisComponent.updateField();      
-//  }
-//}, 1000);

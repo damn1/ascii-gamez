@@ -3,11 +3,11 @@ const PIXEL_PROBABILITY = 0.6;
 const X = 0;
 const Y = 1;
 // field constants:
-const MIN_ROW = 7;
-const MIN_COL = 8;
+const MIN_ROW = 9;
+const MIN_COL = 9;
 // pieces constants:
-const DEFAULT_ROW_B = 4;
-const DEFAULT_COL_B = 4;
+const DEFAULT_ROW_B = 3;
+const DEFAULT_COL_B = 3;
 // input for blocks dimension
 var rowsBlock = DEFAULT_ROW_B;
 var colsBlock = DEFAULT_COL_B;
@@ -26,6 +26,8 @@ const UP    = 'up';
 const CLOCK = 'clock';
 const CNTCL = 'counterclock';
 const DEFAULT_NAME = 'damn';
+var name = DEFAULT_NAME;
+
 // boolean matrices for field, block, next block
 var field_mat = [];
 var next_block  = [];
@@ -35,10 +37,12 @@ var curr_pos = [];
 // ruler variable for falling blocks
 var playing = false;
 // header of the field
-var fieldTitle = 'damn T E T R I S';
-var name = DEFAULT_NAME;
-var score = 10;
+var fieldTitle = ' T E T R I S';
+var score = 0;
 var blocks_counter = 0;
+// backup position
+var curr_pos_back = [-1, -1];
+
 /**
  * init initialization function to create field and first block.
  */
@@ -70,42 +74,84 @@ function init(fieldRows, fieldCols, blockRows, blockCols)
   next_block = genBlock();
 }
 
+/**
+ *
+ */
+var fallingBlock = function() {
+  curr_pos_back[X] = curr_pos[X];
+  curr_pos_back[Y] = curr_pos[Y];
+  move(DOWN, curr_pos, curr_block);
+  if (curr_pos_back[Y] !== curr_pos[Y])
+  { return true; }
+  else
+  {
+    return false;
+    curr_pos_back = [-1, -1];
+  }
+}
 
-var commandsData =
+var stepOver = function()
+{
+  if (playing)
+  {
+    var falling = fallingBlock();
+    appMain.$refs.asciiTetrisComponent.updateField();
+    if (!falling)
     {
-      start: '' +
-      //    '┌───────────────────────────┐\n' +
-      //    '            START            \n' +
-      //    '└───────────────────────────┘\n',
-      'START\n',
-      commandsRotation: '' +
-      '      ┌───┬───┐\n' +
-      '      │ ↺ │ ↻ │\n' +
-      '      └───┴───┘',
-      commandsTranslation: '' +
-      '┌───┬───┬───┐\n' +
-      '│ ← │ ↓ │ → │\n' +
-      '└───┴───┴───┘',
-      // dynamic style color
-      dynamicColor: {
-        color: DEFAULT_COLOR,
-      },
-      // field's parameters
-      rows: MIN_ROW,
-      cols: MIN_COL,
-      // blocks' parameters
-      rowsBlock: DEFAULT_ROW_B,
-      colsBlock: DEFAULT_COL_B,
-      // commands' parameters
-      left  : LEFT_init ,
-      right : RIGHT_init,
-      down  : DOWN_init ,
-      up    : UP_init   ,
-      clock : CLOCK_init,
-      cntcl : CNTCL_init,
-
-      name  : DEFAULT_NAME,
+      var clean = cleanField();
+      adjustAfterClean(clean);
+      curr_block = next_block;
+      blocks_counter++;
+      next_block = genBlock();
+      curr_pos[X] = spawn(curr_block);
+      curr_pos[Y] = 0;
+      if (curr_pos[X] > -1)
+      { score += scoreBlock(curr_block); }
+      else
+      { 
+        playing = false;
+        fieldTitle = 'You lost... bye';
+      }
+      appMain.$refs.asciiTetrisComponent.updateField();
     }
+  }
+}
+
+var commandsData = {
+  tetrisIntervalHandle: -1,
+  start: '' +
+  //    '┌───────────────────────────┐\n' +
+  //    '            START            \n' +
+  //    '└───────────────────────────┘\n',
+  'START\n',
+  commandsRotation: '' +
+  '      ┌───┬───┐\n' +
+  '      │ ↺ │ ↻ │\n' +
+  '      └───┴───┘',
+  commandsTranslation: '' +
+  '┌───┬───┬───┐\n' +
+  '│ ← │ ↓ │ → │\n' +
+  '└───┴───┴───┘',
+  // dynamic style color
+  dynamicColor: {
+    color: DEFAULT_COLOR,
+  },
+  // field's parameters
+  rows: MIN_ROW,
+  cols: MIN_COL,
+  // blocks' parameters
+  rowsBlock: DEFAULT_ROW_B,
+  colsBlock: DEFAULT_COL_B,
+  // commands' parameters
+  left  : LEFT_init ,
+  right : RIGHT_init,
+  down  : DOWN_init ,
+  up    : UP_init   ,
+  clock : CLOCK_init,
+  cntcl : CNTCL_init,
+
+  name  : DEFAULT_NAME,
+}
 
 /* 
  * ascii-tetris-commands component: 
@@ -182,12 +228,20 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   '          <input id="input-clock" class="tetris-command" type="text" v-model="clock">' +
   '        </div>' +
   '      </div>' +
-  '      <div id="start-container" class="row">' +
-  '        <div id="start-label-container" class="col-sm-12">' +
+  '      <div class="row overlap-input-container">' +
+  '        <div class="col-sm-12 label-container">' +
   '          <pre class="command-label start">{{ start }}</pre>' +
   '        </div>' +
-  '        <div id="start-input-container">' +
+  '        <div class="input-container">' +
   '          <input type="text" v-on:keyup="keymonitor"  v-on:click="startMatch">' +
+  '        </div>' +
+  '      </div>' +
+  '      <div class="row overlap-input-container">' +
+  '        <div class="col-sm-12 label-container">' +
+  '          <pre class="command-label start">RESET</pre>' +
+  '        </div>' +
+  '        <div class="input-container">' +
+  '          <input type="text" v-on:keyup="keymonitor"  v-on:click="reset">' +
   '        </div>' +
   '      </div>' +
   '    </div>',
@@ -199,7 +253,6 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   {
     keymonitor: function(event)
     {
-      console.log(event.key);
       switch(event.key)
       {
         case this.left:
@@ -232,13 +285,17 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
       if (!playing)
       {
         playing = true;
+        fieldTitle = 'playing';
+        curr_block = next_block;
+        next_block = genBlock();
+        curr_pos[X] = spawn(curr_block);
+        curr_pos[Y] = 0;
+        if (curr_pos[X] > -1)
+        { score += scoreBlock(curr_block); }        
+        this.start = 'keep focus to give inputs';
+        this.$parent.updateField();
+        this.tetrisIntervalHandle = window.setInterval(stepOver, 1000);
       }
-      curr_block = next_block;
-      next_block = genBlock();
-      curr_pos[X] = spawn(curr_block);
-      curr_pos[Y] = 0;
-      this.start = 'keep focus to give inputs'
-      this.$parent.updateField();
     },
 
     /**
@@ -250,11 +307,22 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
     {
       this.$emit('colorPick', this.dynamicColor);
     },
-    
+
     nameUpdate: function()
     {
       name = this.name;
       this.$parent.updateField();
+    },
+
+    reset: function()
+    {
+      playing = false;
+      score = 0;
+      blocks_counter = 0;
+      curr_pos_back = [-1, -1];
+      fieldTitle = 'reset';
+      window.clearInterval(this.tetrisIntervalHandle)
+      this.reInitField();
     },
 
     /**
