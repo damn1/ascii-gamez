@@ -1,3 +1,18 @@
+.tetris-input-container {
+  width: 300px;
+}
+
+.tetris-input-container .row {
+  margin: auto;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.tetris-input-container div[class^="col-"] {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
 .tetris-input-container pre {
   margin-bottom: 0px;
 }
@@ -13,20 +28,8 @@
   text-align: center;
 }
 
-.tetris-input-container {
-  color: #0a0;
-  width: 300px;
-}
-
-.tetris-input-container .row {
-  margin: auto;
-  margin-bottom: 3px;
-  width: 100%;
-}
-
-.tetris-input-container div[class^="col-"] {
-  padding-left: 6px;
-  padding-right: 6px;
+#input-name { /* special length for this tetris-input */
+  width: 72px;
 }
 
 .right {

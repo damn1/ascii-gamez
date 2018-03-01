@@ -6,6 +6,10 @@
  */
 function toStringField()
 {
+  var distance = '   ';
+  for (var c = 0; c < curr_block[0].length; c++)
+  { distance += '  '; }
+  
   var field_str = '  ┌─';
   for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '──'; }
@@ -14,14 +18,13 @@ function toStringField()
   for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '──'; }
   field_str += '┐│* ';
-  field_str += '    Player    ' + ('         ' + name).slice(-9) + '\n';
+  field_str += '    Player    ' + (distance + name).slice(-distance.length) + '\n';
 
   // title row:
   field_str += ' *││';
 
   if (Math.ceil(fieldTitle.length / 2) > field_mat[0].length)
   {
-    console.log('il title non ci sta');
     fieldTitle = ' ';
   }
   if (fieldTitle.length % 2 == 1)
@@ -30,11 +33,6 @@ function toStringField()
   var startingAt = 0;
   var surplus = (field_mat[0].length - (fieldTitle.length / 2));
   startingAt = Math.floor(surplus / 2)
-
-  console.log(fieldTitle.length);
-  console.log(field_mat[0].length);
-  console.log(surplus);
-  console.log(startingAt);
 
   for (var c = 0; c < field_mat[0].length; c++)
   {
@@ -48,7 +46,7 @@ function toStringField()
   for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '──'; }
   field_str += '┤│* ';
-  field_str += '    Score         ' + ('     ' + score).slice(-5) + '\n';
+  field_str += '    Score     ' + (distance + score).slice(-distance.length) + '\n';
 
   var printingNext = false;
   var counterRowNext = 0;
@@ -61,19 +59,19 @@ function toStringField()
     if (r == 3) 
     { printingNext = true; }
     if (r == 1)
-    { field_str += '    Blocks        ' + ('     ' + blocks_counter).slice(-5) + '\n'; }
+    { field_str += '    Blocks    ' + (distance + blocks_counter).slice(-distance.length) + '\n'; }
     else if (printingNext)
     {
-      if (counterRowNext == (Math.floor(next_mat[0].length / 2 - 0.1)))
+      if (counterRowNext == (Math.floor(next_block.length / 2 - 0.1)))
       { field_str += '    Next         '; }
       else
       { field_str += '                 '; }
-      field_str = printBlockRow(counterRowNext, next_mat, field_str);
+      field_str = printBlockRow(counterRowNext, next_block, field_str);
       field_str += '\n';
       counterRowNext++;
-      if (counterRowNext >= rowsBlock)
+      if (counterRowNext >= curr_block.length)
       { printingNext = false; }
-    } else if (r == rowsBlock + 4)
+    } else if (r == curr_block.length + 4)
     {
       /* qui si può aggiungere qualcosa all'interfaccia. */
       // in tal caso bisognerebbe incrementare il numero minimo di righe.
@@ -83,10 +81,10 @@ function toStringField()
     { field_str += '\n'; }
   }
   field_str += '──┴┴';
-  for (var c = 0; c < field_mat[1].length; c++)
+  for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '──'; }
   field_str += '┴┴──\n////////';
-  for (var c = 0; c < field_mat[1].length; c++)
+  for (var c = 0; c < field_mat[0].length; c++)
   { field_str += '//'; }
   field_str += '\n';
   return field_str;
@@ -117,29 +115,29 @@ function printBlockRow(row, block, field_str)
 function genBlock()
 {
   var block = [];
-  for(var i = 0; i < rowsBlock; i++)
+  for(var i = 0; i < curr_block.length; i++)
   {
     var row = new Array();
-    for(var j = 0; j < colsBlock; j++)
+    for(var j = 0; j < curr_block[0].length; j++)
     {
       row.push(false);
     }
     block.push(row);
   }
-  var first = Math.floor(Math.random() * rowsBlock * colsBlock);
+  var first = Math.floor(Math.random() * curr_block.length * curr_block[0].length);
   var counter = 0;
-  for (var i = 0; i < rowsBlock; i++)
+  for (var i = 0; i < curr_block.length; i++)
   {
-    for (var j = 0; j < colsBlock; j++)
+    for (var j = 0; j < curr_block[0].length; j++)
     {
       if (first == counter)
       { block[i][j] = true; }
       counter++;
     }
   }
-  for (var i = 0; i < rowsBlock; i++)
+  for (var i = 0; i < curr_block.length; i++)
   {
-    for (var j = 0; j < colsBlock; j++)
+    for (var j = 0; j < curr_block[0].length; j++)
     {
       if (adiacency(i, j, block))
       {
@@ -163,10 +161,12 @@ function genBlock()
 function adiacency(row, col, block) {
   switch (row) {
     case 0:
+      if (block.length <= 1)
+      { break; }
       if (block[row + 1][col])
       { return true; }
       break;
-    case rowsBlock - 1:
+    case curr_block.length - 1:
       if (block[row - 1][col])
       { return true; }
       break;
@@ -176,10 +176,12 @@ function adiacency(row, col, block) {
   }
   switch (col) {
     case 0:
+      if (block[row].length <= 1)
+      { break; }
       if (block[row][col + 1])
       { return true; }
       break;
-    case colsBlock - 1:
+    case curr_block[0].length - 1:
       if (block[row][col - 1])
       { return true; }
       break;
@@ -200,13 +202,13 @@ function adiacency(row, col, block) {
 function spawn(block)
 {
   // check for NxM free space starting from the left
-  for (var pos_x = 0; pos_x <= field_mat[0].length - colsBlock; pos_x++) {
+  for (var pos_x = 0; pos_x <= field_mat[0].length - curr_block[0].length; pos_x++) {
     // count free cells from pos_x
     // if ok, [pos_x][0] will be high left corner of the NxM free space
     var freeCount = 0;
-    for (var x = pos_x; x < pos_x + colsBlock; x++)
+    for (var x = pos_x; x < pos_x + curr_block[0].length; x++)
     {
-      for (var y = 0; y < rowsBlock; y++)
+      for (var y = 0; y < curr_block.length; y++)
       {
         if (field_mat[y][x] == false)
         { freeCount++; }
@@ -215,9 +217,9 @@ function spawn(block)
 
     if (freeCount == block[0].length * block.length)
     {
-      for (var x = pos_x; x < pos_x + colsBlock; x++)
+      for (var x = pos_x; x < pos_x + curr_block[0].length; x++)
       {
-        for (var y = 0; y < rowsBlock; y++)
+        for (var y = 0; y < curr_block.length; y++)
         { field_mat[y][x] = block[y][x - pos_x]; }
       }
       return pos_x;
@@ -659,9 +661,10 @@ function move(move, pos_xy, block)
     default:
       console.log('minchione');
   }
-  curr_mat = block;
+  curr_block = block;
   return true;
 }
+
 
 var curr_pos_back = [-1, -1];
 
@@ -671,7 +674,7 @@ var fallingBlock = function() {
   {
     curr_pos_back[X] = curr_pos[X];
     curr_pos_back[Y] = curr_pos[Y];
-    move(DOWN, curr_pos, curr_mat); 
+    move(DOWN, curr_pos, curr_block); 
   }
   else
   {
@@ -690,9 +693,12 @@ var tetris_data = {
     '  ██    ██████    ██    ██  ██  ██  ██████\n' +
     '            ascii tetris by damn1         \n',
   field_str_vue: toStringField(),
+  // dynamic styling element, updated from events of child components
+  dynamicColor: {
+    color: DEFAULT_COLOR
+  },
   score: 0,
   blocks_counter: 0,
-  name: '',
 }
 
 
@@ -705,15 +711,15 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
     '    <div class="container"> ' +
     '    <div class="row"> ' +
     '      <div class="game-intro"> ' +
-    '        <pre>{{ intro }}</pre> ' +
+    '        <pre v-bind:style="dynamicColor">{{ intro }}</pre> ' +
     '      </div> ' +
     '    </div> ' +
     '    <div class="row"> ' +
     '      <div class="game-intro col-sm-8"> ' +
-    '        <pre>{{ field_str_vue }}</pre> ' +
+    '        <pre  v-bind:style="dynamicColor">{{ field_str_vue }}</pre> ' +
     '      </div> ' +
     '      <div class="col-sm-4"> ' +
-    '        <ascii-tetris-commands></ascii-tetris-commands>' +
+    '        <ascii-tetris-commands @colorPick="onColorPickTetrisCommands"></ascii-tetris-commands>' +
     '      </div> ' +
     '    </div> ' +
     '    </div> ' +
@@ -728,9 +734,24 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
   },
   methods:
   {
+    /**
+     * updateField simple function to update reactive element field.
+     */
     updateField: function()
     {
       this.field_str_vue = toStringField();
+    },
+    
+    /**
+     * onColorPickTetrisCommands is invoked from an event emitted from child
+     *                           <ascii-tetris-commands>, sets the color to the
+     *                           chosen one from that component.
+     *
+     * @param childDynStyle the object containing dynamic styling
+     */
+    onColorPickTetrisCommands(childDynStyle)
+    {
+      this.dynamicColor = childDynStyle;
     }
   }
 });

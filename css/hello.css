@@ -1,8 +1,3 @@
-body {
-  background-color: #000;
-  font-family: monospace;
-}
-
 input, button { 
   outline: none;
 }
@@ -17,71 +12,7 @@ input, button {
 }
 
 pre {
-  color: #0a0;
   display: inline-block;
   text-align: left;
   line-height: normal;
-}
-
-/* ------------------------------- FOOTER CSS ------------------------------- */
-.footer {
-  text-align: right;
-  color: ghostwhite;
-  width: 100%;
-  height: 44px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  background-color: #112;
-  border-top: 1px solid #444;
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
-  z-index: 20;
-}
-
-#githublogo {
-  height: 36px;
-  width: 36px;
-  fill: ghostwhite;
-}
-
-.footer .contacts {
-  float: right;
-  margin-right: 20px;
-}
-
-.footer .contacts p {
-  line-height: 20px; 
-  margin-top: 8px;
-  /* for footer text: */
-  color: white;
-}
-
-#app-tetris { /* dont overlap footer to app container */
-  margin-bottom: 60px;
-}
-
-/* ------------------------------- NAVBAR CSS ------------------------------- */
-.navbar {
-  width: 100%;
-  display: flex;
-  background: #111;
-}
-
-.navbar .nav-link {
-  width: 150px;
-  text-align: center;
-  margin-left: 20px;
-  flex-grow: 1;
-}
-
-.navbar .nav-link p {
-  color: #0a0;
-}
-
-/* these element ids are defined in vue component ascii-nav-link */
-#ascii-blackjack-icon, #ascii-tetris-icon {
-  height: 56px;
-  width: 56px;
-  fill: #0a0;
 }
