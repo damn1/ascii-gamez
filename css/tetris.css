@@ -1,3 +1,23 @@
+input, button { 
+  outline: none;
+}
+
+.game-container { 
+  text-align: center;
+}
+
+.game-intro {
+  width: 100%;
+  text-align: center;
+}
+
+pre {
+  display: inline-block;
+  text-align: left;
+  line-height: normal;
+}
+
+/* ---------------------  CSS for input commands panel ---------------------- */
 .tetris-input-container {
   width: 300px;
 }

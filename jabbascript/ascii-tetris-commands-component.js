@@ -1,122 +1,6 @@
-const DEFAULT_COLOR = '#00aa00';
-const PIXEL_PROBABILITY = 0.6;
-const X = 0;
-const Y = 1;
-// field constants:
-const MIN_ROW = 9;
-const MIN_COL = 9;
-// pieces constants:
-const DEFAULT_ROW_B = 3;
-const DEFAULT_COL_B = 3;
-// input for blocks dimension
-var rowsBlock = DEFAULT_ROW_B;
-var colsBlock = DEFAULT_COL_B;
-// default values
-const LEFT_init  = 'a';
-const RIGHT_init = 'd';
-const DOWN_init  = 's';
-const UP_init    = 'w';
-const CLOCK_init = 'l';
-const CNTCL_init = 'k';
-// enum moves
-const LEFT  = 'left';
-const RIGHT = 'right';
-const DOWN  = 'down';
-const UP    = 'up';
-const CLOCK = 'clock';
-const CNTCL = 'counterclock';
-const DEFAULT_NAME = 'damn';
-var name = DEFAULT_NAME;
-
-// boolean matrices for field, block, next block
-var field_mat = [];
-var next_block  = [];
-var curr_block  = [];
-// (X,Y) position container
-var curr_pos = [];
-// ruler variable for falling blocks
-var playing = false;
-// header of the field
-var fieldTitle = ' T E T R I S';
-var score = 0;
-var blocks_counter = 0;
-// backup position
-var curr_pos_back = [-1, -1];
-
 /**
- * init initialization function to create field and first block.
+ * commandsData object containing variables binded to ui inputs.
  */
-function init(fieldRows, fieldCols, blockRows, blockCols)
-{
-  field_mat = [];
-  next_block  = [];
-  curr_block  = [];
-  // init field to void
-  for(var i = 0; i < fieldRows; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < fieldCols; j++)
-    { row.push(false); }
-    field_mat.push(row);
-  }
-
-  // init next block to void
-  for(var i = 0; i < blockRows; i++)
-  {
-    var row = new Array();
-    for(var j = 0; j < blockCols; j++)
-    { row.push(false); }
-    next_block.push(row);
-    curr_block.push(row);
-  }
-  curr_pos.push(0);
-  curr_pos.push(0);
-  next_block = genBlock();
-}
-
-/**
- *
- */
-var fallingBlock = function() {
-  curr_pos_back[X] = curr_pos[X];
-  curr_pos_back[Y] = curr_pos[Y];
-  move(DOWN, curr_pos, curr_block);
-  if (curr_pos_back[Y] !== curr_pos[Y])
-  { return true; }
-  else
-  {
-    return false;
-    curr_pos_back = [-1, -1];
-  }
-}
-
-var stepOver = function()
-{
-  if (playing)
-  {
-    var falling = fallingBlock();
-    appMain.$refs.asciiTetrisComponent.updateField();
-    if (!falling)
-    {
-      var clean = cleanField();
-      adjustAfterClean(clean);
-      curr_block = next_block;
-      blocks_counter++;
-      next_block = genBlock();
-      curr_pos[X] = spawn(curr_block);
-      curr_pos[Y] = 0;
-      if (curr_pos[X] > -1)
-      { score += scoreBlock(curr_block); }
-      else
-      { 
-        playing = false;
-        fieldTitle = 'You lost... bye';
-      }
-      appMain.$refs.asciiTetrisComponent.updateField();
-    }
-  }
-}
-
 var commandsData = {
   tetrisIntervalHandle: -1,
   start: '' +
@@ -291,7 +175,10 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
         curr_pos[X] = spawn(curr_block);
         curr_pos[Y] = 0;
         if (curr_pos[X] > -1)
-        { score += scoreBlock(curr_block); }        
+        {
+          score += scoreBlock(curr_block);
+          blocks_counter++;
+        }
         this.start = 'keep focus to give inputs';
         this.$parent.updateField();
         this.tetrisIntervalHandle = window.setInterval(stepOver, 1000);
@@ -316,6 +203,7 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
 
     reset: function()
     {
+      this.start = 'START';
       playing = false;
       score = 0;
       blocks_counter = 0;
