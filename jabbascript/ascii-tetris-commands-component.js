@@ -42,7 +42,7 @@ var commandsData = {
  * a simple container of bootstrap rows with labels and input values for moves
  * commands (right, left...) and for game parameters (rows, cols).
  */
-const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
+const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   template: '' +
   '    <div class="tetris-input-container" v-bind:style="dynamicColor">' +
   '      <div class="row">' +
@@ -181,7 +181,7 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
         }
         this.start = 'keep focus to give inputs';
         this.$parent.updateField();
-        this.tetrisIntervalHandle = window.setInterval(stepOver, 1000);
+        this.tetrisIntervalHandle = window.setInterval(this.stepOver, 1000);
       }
     },
 
@@ -211,6 +211,38 @@ const asciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
       fieldTitle = 'reset';
       window.clearInterval(this.tetrisIntervalHandle)
       this.reInitField();
+    },
+
+
+    /**
+     * stepOver function to manage the match: makes the blocks falling and when a
+     *          block is stopped generates and spawn a new one.
+     */
+    stepOver: function()
+    {
+      if (playing)
+      {
+        var falling = fallingBlock();
+        this.$parent.updateField();
+        if (!falling)
+        {
+          var clean = cleanField();
+          adjustAfterClean(clean);
+          curr_block = next_block;
+          blocks_counter++;
+          next_block = genBlock();
+          curr_pos[X] = spawn(curr_block);
+          curr_pos[Y] = 0;
+          if (curr_pos[X] > -1)
+          { score += scoreBlock(curr_block); }
+          else
+          { 
+            playing = false;
+            fieldTitle = 'You lost... bye';
+          }
+          this.$parent.updateField();
+        }
+      }
     },
 
     /**

@@ -18,18 +18,17 @@ var navData = {
   ]
 };
 
-
 // Define navbar link component
 Vue.component('ascii-nav-link', {
   props: ['game'],
   template: '' +
-  '    <div class="nav-link">' +
-  '      <a :href="game.name">' +
+  '    <div class="nav-link active">' +
+  '      <router-link :to="`/` + game.name">' +
   '        <span class="nav-icon">' +
   '          <img :id="game.name + `-icon`" class="svg" :src="`./assets/icons/` + game.img"></img>' +
   '        </span> ' +
   '        <p>{{ game.name }}</p>' +
-  '      </a>' +
+  '      </router-link>' +
   '    </div>'
 });
 

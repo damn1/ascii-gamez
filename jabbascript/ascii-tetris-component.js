@@ -1,5 +1,3 @@
-init(MIN_ROW, MIN_COL, DEFAULT_ROW_B, DEFAULT_COL_B);
-
 /**
  * tetris_data object containing data to bind in the vue component
  */
@@ -23,7 +21,7 @@ var tetris_data = {
 /**
  * asciiTetrisComponent Vue.js component that hold the tetris application.
  */ 
-var asciiTetrisComponent = Vue.component('ascii-tetris', {
+const AsciiTetrisComponent = Vue.component('ascii-tetris', {
   template: '' +
   '  <div id="app-tetris"> ' +
   '    <div class="container"> ' +
@@ -44,7 +42,7 @@ var asciiTetrisComponent = Vue.component('ascii-tetris', {
   '  </div> ',
   components:
   {
-    asciiTetrisCommandsComponent
+    AsciiTetrisCommandsComponent
   },
   data: function()
   {

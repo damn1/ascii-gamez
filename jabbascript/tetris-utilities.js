@@ -94,36 +94,6 @@ var fallingBlock = function() {
 }
 
 /**
- * stepOver function to manage passing from one block to the next.
- */
-var stepOver = function()
-{
-  if (playing)
-  {
-    var falling = fallingBlock();
-    appMain.$refs.asciiTetrisComponent.updateField();
-    if (!falling)
-    {
-      var clean = cleanField();
-      adjustAfterClean(clean);
-      curr_block = next_block;
-      blocks_counter++;
-      next_block = genBlock();
-      curr_pos[X] = spawn(curr_block);
-      curr_pos[Y] = 0;
-      if (curr_pos[X] > -1)
-      { score += scoreBlock(curr_block); }
-      else
-      { 
-        playing = false;
-        fieldTitle = 'You lost... bye';
-      }
-      appMain.$refs.asciiTetrisComponent.updateField();
-    }
-  }
-}
-
-/**
  * toStringField method to build the field as a string starting from the field
  *               as a matrix.
  *
@@ -869,3 +839,6 @@ function adjustAfterClean(rowsClean)
     { rowsClean[r1] = rowsClean[r1] + 1; }
   }
 }
+
+// init field with default values
+init(MIN_ROW, MIN_COL, DEFAULT_ROW_B, DEFAULT_COL_B);
