@@ -7,7 +7,7 @@ var tetris_data = {
   '  ██    ████      ██    ██  ██  ██  ██    \n' +
   '  ██    ██        ██    ████    ██      ██\n' +
   '  ██    ██████    ██    ██  ██  ██  ██████\n' +
-  '              damn1-ascii-tetris          \n',
+  '            damn1-ascii-tetris            \n',
   field_str_vue: toStringField(),
   // dynamic styling element, updated from events of child components
   dynamicColor: {

@@ -25,6 +25,10 @@ body {
   fill: ghostwhite;
 }
 
+#vuejslogo {
+  height: 36px;
+}
+
 .footer .contacts {
   float: right;
   margin-right: 20px;

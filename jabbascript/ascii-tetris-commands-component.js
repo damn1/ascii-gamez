@@ -181,7 +181,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
         }
         this.start = 'keep focus to give inputs';
         this.$parent.updateField();
-        this.tetrisIntervalHandle = window.setInterval(this.stepOver, 1000);
+        //this.tetrisIntervalHandle = window.setInterval(this.stepOver, 1000);
       }
     },
 

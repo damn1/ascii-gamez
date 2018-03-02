@@ -32,6 +32,7 @@ var name = DEFAULT_NAME;
 var field_mat = [];
 var next_block  = [];
 var curr_block  = [];
+
 // (X,Y) position container
 var curr_pos = [];
 // ruler variable for falling blocks
@@ -69,8 +70,8 @@ function init(fieldRows, fieldCols, blockRows, blockCols)
     next_block.push(row);
     curr_block.push(row);
   }
-  curr_pos.push(0);
-  curr_pos.push(0);
+  curr_pos[X] = -1;
+  curr_pos[Y] = -1;
   next_block = genBlock();
 }
 
@@ -102,7 +103,7 @@ var fallingBlock = function() {
 function toStringField()
 {
   var distance = '   ';
-  for (var c = 0; c < curr_block[0].length; c++)
+  for (var c = 0; c < next_block[0].length; c++)
   { distance += '  '; }
 
   var field_str = '  ┌─';
@@ -296,14 +297,97 @@ function adiacency(row, col, block) {
  */
 function spawn(block)
 {
+  // cut the block
+  var freeRows = [];
+  for (var r = 0; r < block.length; r++)
+  {
+    var freeRow = true;
+    for (var c = 0; c < block[0].length; c++)
+    {
+      if (block[r][c])
+      { freeRow = false; }
+    }
+    if (freeRow)
+    { freeRows.push(r); }
+  }
+  var freeCols = [];
+  for (var c = 0; c < block[0].length; c++)
+  {
+    var freeCol = true;
+    for (var r = 0; r < block.length; r++)
+    {
+      if (block[r][c])
+      { freeCol = false; }
+    }
+    if (freeCol)
+    { freeCols.push(c); }
+  }
+
+  var sliceup = - 1;
+  var slicedw = block.length;
+  if (freeRows.length > 0)
+  {
+    if (freeRows[0] !== 0)
+    {
+      sliceup = 0;
+      slicedw = freeRows[0];
+    }
+    else
+    {
+      for (var fr = 0; fr < freeRows.length; fr ++)
+      {
+        if (freeRows[fr] === sliceup + 1)
+        { sliceup = freeRows[fr]; }
+        else
+        {
+          slicedw = freeRows[fr];
+          break; // the for
+        }
+      }
+      sliceup++;
+    }
+  }
+  else
+  { sliceup = 0; }
+  block = block.slice(sliceup, slicedw);
+
+  var slicelft = - 1;
+  var slicergt = block[0].length;
+  if (freeCols.length > 0)
+  {
+    if (freeCols[0] !== 0)
+    {
+      slicelft = 0;
+      slicergt = freeCols[0];
+    }
+    else
+    {
+      for (var fc = 0; fc < freeCols.length; fc ++)
+      {
+        if (freeCols[fc] === slicelft + 1)
+        { slicelft = freeCols[fc]; }
+        else
+        {
+          slicergt = freeCols[fc];
+          break; // the for
+        }
+      }
+      slicelft++;
+    }
+  }
+  else
+  { slicelft = 0; }
+  for (var r = 0; r < block.length; r++)
+  { block[r] = block[r].slice(slicelft, slicergt); }
+
   // check for NxM free space starting from the left
-  for (var pos_x = 0; pos_x <= field_mat[0].length - curr_block[0].length; pos_x++) {
+  for (var pos_x = 0; pos_x <= field_mat[0].length - block[0].length; pos_x++) {
     // count free cells from pos_x
     // if ok, [pos_x][0] will be high left corner of the NxM free space
     var freeCount = 0;
-    for (var x = pos_x; x < pos_x + curr_block[0].length; x++)
+    for (var x = pos_x; x < pos_x + block[0].length; x++)
     {
-      for (var y = 0; y < curr_block.length; y++)
+      for (var y = 0; y < block.length; y++)
       {
         if (field_mat[y][x] == false)
         { freeCount++; }
@@ -312,11 +396,12 @@ function spawn(block)
 
     if (freeCount == block[0].length * block.length)
     {
-      for (var x = pos_x; x < pos_x + curr_block[0].length; x++)
+      for (var x = pos_x; x < pos_x + block[0].length; x++)
       {
-        for (var y = 0; y < curr_block.length; y++)
+        for (var y = 0; y < block.length; y++)
         { field_mat[y][x] = block[y][x - pos_x]; }
       }
+      curr_block = block;
       return pos_x;
     }
   }
@@ -354,7 +439,7 @@ function rotateBlock(block, clockwise)
       }
     }
   }
-  else
+  else // counter clock
   {
     for (var row = 0; row < block.length; row++)
     {
@@ -369,7 +454,21 @@ function rotateBlock(block, clockwise)
   return newBlock;
 }
 
+function massCenter(block)
+{
+  var coords = [-1, -1]; // (X,Y) coordinates
+  if (block.length % 2 === 1)
+  { coords[Y] = Math.floor(block.length / 2); }
+  else
+  { coords[Y] = block.length / 2 - 1; }
 
+  if (block[0].length % 2 === 1)
+  { coords[X] = Math.floor(block[0].length / 2); }
+  else
+  { coords[X] = block[0].length / 2 - 1; }
+  
+  return coords;
+}
 /**
  * substitute method to check if a rotated block is valid, and substitute the
  *            previous one.
@@ -380,6 +479,22 @@ function rotateBlock(block, clockwise)
  * @return true if the substitution has been done
  */
 function substitute(pos_xy, block, rotatedBlock) {
+  // find center of the old block
+  var rotationCenter = massCenter(block);
+  var rotatedRotationCenter = massCenter(rotatedBlock);
+  
+  var newPos = [pos_xy[X], pos_xy[Y]];
+
+  if (block.length !== block[0].length)
+  {
+    newPos[X] = pos_xy[X] - (rotatedRotationCenter[X] - rotationCenter[X]);
+    newPos[Y] = pos_xy[Y] - (rotatedRotationCenter[Y] - rotationCenter[Y]);
+  }
+
+  if (newPos[X] < 0 || (newPos[X] + rotatedBlock[0].length) > field_mat[0].length ||
+      newPos[Y] < 0 || (newPos[Y] + rotatedBlock.length) > field_mat.length )
+  { return false; }
+
   // remove block
   for (var row = 0; row < block.length; row++)
   {
@@ -389,6 +504,7 @@ function substitute(pos_xy, block, rotatedBlock) {
       { field_mat[pos_xy[Y] + row][pos_xy[X] + col] = false; }
     }
   }
+
   // try to place new block
   var counterMoveable = 0;
   for (var row = 0; row < rotatedBlock.length; row++)
@@ -397,30 +513,34 @@ function substitute(pos_xy, block, rotatedBlock) {
     {
       if (rotatedBlock[row][col] == true)
       {
-        if (field_mat[pos_xy[Y] + row][pos_xy[X] + col] == false)
+        if (field_mat[newPos[Y] + row][newPos[X] + col] == false)
         { counterMoveable++; }
       }
       else
       { counterMoveable++; }
     }
   }
+
+  // finally place rotated or old block
   if (counterMoveable == rotatedBlock.length * rotatedBlock[0].length)
-  {
+  { // the rotation can be done; update pos
+    pos_xy[X] = newPos[X];
+    pos_xy[Y] = newPos[Y];
     for (var row = 0; row < rotatedBlock.length; row++)
     {
       for (var col = 0; col < rotatedBlock[0].length; col++)
       {
         if (rotatedBlock[row][col] == true)
-        { field_mat[pos_xy[1] + row][pos_xy[0] + col] = rotatedBlock[row][col]; }
+        { field_mat[pos_xy[Y] + row][pos_xy[X] + col] = rotatedBlock[row][col]; }
       }
     }
     return true;
   }
   else
   {
-    for (var row = 0; row < rotatedBlock.length; row++)
+    for (var row = 0; row < block.length; row++)
     {
-      for (var col = 0; col < rotatedBlock[0].length; col++)
+      for (var col = 0; col < block[0].length; col++)
       {
         if (block[row][col] == true)
         { field_mat[pos_xy[Y] + row][pos_xy[X] + col] = block[row][col]; }
