@@ -41,8 +41,34 @@ body {
   color: white;
 }
 
-#app-tetris { /* dont overlap footer to app container */
-  margin-bottom: 60px;
+/* ------------------------ icons-attribution el CSS ------------------------ */
+#flaticonlogo {
+  height: 36px;
+}
+
+.icons-attribution {
+  position: sticky;
+  bottom: 100px;
+  left: 0px;
+  text-align: right;
+  font-size: 10px;
+  color: #666;
+}
+
+.icons-attribution a {
+  text-decoration: none; /* no underline link on hover */
+  color: rgba(163, 252, 83, .75); /* same color of flaticon logo */
+}
+
+.sub-icons-attr p {
+  line-height: 10px;
+  padding-top: 13px;
+}
+
+.sub-icons-attr { /* make image aside div with attributions */
+  display: inline-block;
+  float: left;
+  margin-left: 10px;
 }
 
 /* ------------------------------- NAVBAR CSS ------------------------------- */

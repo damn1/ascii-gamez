@@ -3,7 +3,7 @@ const PIXEL_PROBABILITY = 0.6;
 const X = 0;
 const Y = 1;
 // field constants:
-const MIN_ROW = 10;
+const MIN_ROW = 16;
 const MIN_COL = 10;
 // pieces constants:
 const DEFAULT_ROW_B = 3;
@@ -82,16 +82,10 @@ function init(fieldRows, fieldCols, blockRows, blockCols)
  *         block needs to be stopped
  */
 var fallingBlock = function() {
-  curr_pos_back[X] = curr_pos[X];
-  curr_pos_back[Y] = curr_pos[Y];
-  move(DOWN, curr_pos, curr_block);
-  if (curr_pos_back[Y] !== curr_pos[Y])
+  if (move(DOWN, curr_pos, curr_block))
   { return true; }
   else
-  {
-    return false;
-    curr_pos_back = [-1, -1];
-  }
+  { return false; }
 }
 
 /**
@@ -626,7 +620,8 @@ function moveable(move, block)
  * @param moveChar the kind of move to be done
  * @param pos_xy high-left corner coordinates of the starting block
  * @param block the block to be moved
- * @return the modified block (e.g. if rotated)
+ * @return true if the block has been moved and sets curr_block to the the
+ *         modified block (e.g. if rotated), false if the move can't be done
  */
 function move(move, pos_xy, block)
 {
@@ -635,7 +630,7 @@ function move(move, pos_xy, block)
   {
     case LEFT: // **************************************************************
       if (!moveable(LEFT, block)) 
-      { break; }
+      { return false; }
 
       counterMoveable = 0;
       for (var row = 0; row < block.length; row++)
@@ -689,7 +684,7 @@ function move(move, pos_xy, block)
 
     case UP: // ****************************************************************
       if (!moveable(UP, block)) 
-      { break; }
+      { return false; }
 
       counterMoveable = 0;
       for (var col = block[0].length - 1; col >= 0; col--)
@@ -743,7 +738,7 @@ function move(move, pos_xy, block)
 
     case DOWN: // **************************************************************
       if (!moveable(DOWN, block)) 
-      { break; }
+      { return false; }
 
       counterMoveable = 0;
       for (var col = block[0].length - 1; col >= 0; col--)
@@ -796,7 +791,7 @@ function move(move, pos_xy, block)
 
     case RIGHT: // *************************************************************
       if (!moveable(RIGHT, block)) 
-      { break; }
+      { return false; }
 
       counterMoveable = 0;
       for (var row = 0; row < block.length; row++) {
@@ -874,7 +869,7 @@ function move(move, pos_xy, block)
       // non faccio niente, il pezzo viene fermato dove è.
       break;
     default:
-      console.log('minchione');
+      console.log('??');
   }
   curr_block = block;
   return true;

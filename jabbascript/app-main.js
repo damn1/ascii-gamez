@@ -2,7 +2,7 @@
 //  el: '#app-main'
 //})
 
-const AsciiBlackjackComponent = { template: '<div style="color: #666">lol nope sorry</div>' }
+const AsciiBlackjackComponent = { template: '<div style="color: #666; margin-bottom: 30px;">lol nope sorry</div>' }
 
 // 2. Define some routes
 // Each route should map to a component. The "component" can

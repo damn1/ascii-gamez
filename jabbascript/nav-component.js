@@ -8,15 +8,44 @@ var navData = {
     {
       key: 0,
       name: 'ascii-tetris',
-      img: '005-shapes-3.svg'
+      img: '005-shapes-3.svg',
+      attributionAuth: 'Freepik',
+      attributionLink: 'https://www.flaticon.com/authors/freepik',
     },
     {
       key: 1,
       name: 'ascii-blackjack',
-      img: '003-cards.svg'
+      img: '003-cards.svg',
+      attributionAuth: 'Freepik',
+      attributionLink: 'https://www.flaticon.com/authors/freepik',
     }
   ]
 };
+
+// A simple div with attributions to author of the icons.
+// It's more footer than nav. But here are the data.
+// For now icons are all from same author so reduce the element to a div to
+// stick into the footer.
+Vue.component('icons-attribution', {
+  template: '' +
+  '  <div class="icons-attribution">' +
+  '    <div class="sub-icons-attr">' +
+  '      <a href="https://www.flaticon.com/">' +
+  '        <img id="flaticonlogo" src="./assets/img/flaticon-logo.png"></img>' +
+  '      </a>' +
+  '    </div>' +
+  '    <div class="sub-icons-attr">' +
+  '      <p>' +
+  '        games icons by' +
+  '        <a :href="asciiGames[0].attributionLink">{{ asciiGames[0].attributionAuth }}</a>' +
+  '      </p>' +
+  '    </div>' +
+  '  </div>',
+  data: function()
+  {
+    return navData;
+  }
+});
 
 // Define navbar link component
 Vue.component('ascii-nav-link', {

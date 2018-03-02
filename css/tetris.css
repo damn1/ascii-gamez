@@ -1,3 +1,7 @@
+#app-tetris {
+  margin-bottom: 60px; /* don't overlap footer */
+}
+
 input, button { 
   outline: none;
 }

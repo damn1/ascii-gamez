@@ -58,7 +58,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   '          <label for="input-rows"><pre class="command-label" v-bind:style="dynamicColor">Rows</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-rows" class="tetris-input" type="number" min="4" v-model="rows" v-on:change="reInitField">' +
+  '          <input id="input-rows" class="tetris-input" type="number" min="4" v-model="rows" v-on:change="reset">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -66,7 +66,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   '          <label for="input-cols"><pre class="command-label" v-bind:style="dynamicColor">Cols</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-cols" class="tetris-input" type="number" v-model="cols" v-on:change="reInitField">' +
+  '          <input id="input-cols" class="tetris-input" type="number" v-model="cols" v-on:change="reset">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -74,7 +74,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   '          <label for="input-rowsBlock"><pre class="command-label" v-bind:style="dynamicColor">Block rows</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-rowsBlock" class="tetris-input" type="number" min="1" v-model="rowsBlock" v-on:change="reInitField">' +
+  '          <input id="input-rowsBlock" class="tetris-input" type="number" min="1" v-model="rowsBlock" v-on:change="reset">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -82,7 +82,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
   '          <label for="input-colsBlock"><pre class="command-label" v-bind:style="dynamicColor">Block cols</pre></label>' +
   '        </div>' +
   '        <div class="col-sm-7 right">' +
-  '          <input id="input-colsBlock" class="tetris-input" type="number" min="1" v-model="colsBlock" v-on:change="reInitField">' +
+  '          <input id="input-colsBlock" class="tetris-input" type="number" min="1" v-model="colsBlock" v-on:change="reset">' +
   '        </div>' +
   '      </div>' +
   '      <div class="row">' +
@@ -181,7 +181,7 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
         }
         this.start = 'keep focus to give inputs';
         this.$parent.updateField();
-        //this.tetrisIntervalHandle = window.setInterval(this.stepOver, 1000);
+        this.tetrisIntervalHandle = window.setInterval(this.stepOver, 1000);
       }
     },
 
@@ -238,9 +238,13 @@ const AsciiTetrisCommandsComponent = Vue.component('ascii-tetris-commands', {
           else
           { 
             playing = false;
-            fieldTitle = 'You lost... bye';
+            fieldTitle = 'lost... bye';
           }
           this.$parent.updateField();
+
+          // following lines to increase falling speed baed on score
+          window.clearInterval(this.tetrisIntervalHandle);
+          this.tetrisIntervalHandle = window.setInterval(this.stepOver, (1000 - (Math.floor(score / 100) * 50)));
         }
       }
     },

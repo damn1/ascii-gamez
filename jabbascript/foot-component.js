@@ -2,6 +2,7 @@
 Vue.component('ascii-foot', {
   template: '' +
   '  <div class="footer">' +
+  '    <icons-attribution></icons-attribution>' +
   '    <a href="https://vuejs.org/">' +
   '      <span class="contacts">' +
   '        <img id="vuejslogo" src="./assets/img/vuejs-logo.png"></img>' +
