@@ -18,7 +18,7 @@ input, button {
 pre {
   display: inline-block;
   text-align: left;
-  line-height: normal;
+  line-height: 1.2em;
 }
 
 /* ---------------------  CSS for input commands panel ---------------------- */
